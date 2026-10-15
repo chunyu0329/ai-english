@@ -97,34 +97,86 @@
 
   <!-- 頂部導覽列 -->
   <header class="sticky top-0 z-50 glass-card border-b shadow-sm transition-all">
-    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center text-white shadow-md shadow-indigo-500/30">
-          <i data-lucide="headphones" class="w-5 h-5"></i>
+    <div class="max-w-6xl mx-auto px-4 py-3 flex flex-col md:flex-row items-center justify-between gap-3">
+      <!-- 品牌 Logo 區 -->
+      <div class="flex items-center justify-between w-full md:w-auto">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center text-white shadow-md shadow-indigo-500/30">
+            <i data-lucide="headphones" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h1 class="text-xl font-extrabold tracking-tight bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent dark:from-indigo-400 dark:to-violet-400">
+              LinguaPulse
+            </h1>
+            <p class="text-[11px] text-slate-500 dark:text-slate-400 font-medium tracking-wide">現代英文聽讀特訓基地</p>
+          </div>
         </div>
-        <div>
-          <h1 class="text-xl font-extrabold tracking-tight bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent dark:from-indigo-400 dark:to-violet-400">
-            LinguaPulse
-          </h1>
-          <p class="text-[11px] text-slate-500 dark:text-slate-400 font-medium tracking-wide">現代英文聽讀特訓基地</p>
+
+        <!-- 手機版右側功能鍵 -->
+        <div class="flex items-center gap-2 md:hidden">
+          <button id="theme-toggle-mobile" class="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-200/60 dark:hover:bg-slate-800 transition-colors" title="切換深淺色模式">
+            <i data-lucide="moon" class="w-4 h-4 dark:hidden"></i>
+            <i data-lucide="sun" class="w-4 h-4 hidden dark:block text-amber-400"></i>
+          </button>
+          <button id="btn-stats-modal-mobile" class="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-200/60 dark:hover:bg-slate-800 transition-colors" title="成就殿堂">
+            <i data-lucide="award" class="w-4 h-4 text-indigo-500"></i>
+          </button>
         </div>
       </div>
 
-      <!-- 連勝指標與快速切換 -->
-      <div class="flex items-center gap-3">
-        <div class="flex items-center gap-1.5 bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800/60 px-3 py-1.5 rounded-full text-xs font-bold text-amber-700 dark:text-amber-300 shadow-sm" title="當前連勝紀錄">
+      <!-- 常駐頂部即時數據膠囊 (Top Stats Bar) -->
+      <div id="top-stats-bar" class="flex flex-wrap items-center justify-center md:justify-end gap-2 w-full md:w-auto">
+        <!-- 答對題數膠囊 -->
+        <div id="badge-score-container" class="flex items-center gap-2 bg-emerald-50/90 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800/60 px-3 py-1.5 rounded-2xl shadow-xs transition-transform duration-300">
+          <div class="w-5 h-5 rounded-lg bg-emerald-500 flex items-center justify-center text-white text-xs">
+            <i data-lucide="check" class="w-3.5 h-3.5 stroke-[3]"></i>
+          </div>
+          <div class="text-xs">
+            <span class="text-slate-500 dark:text-slate-400 font-medium text-[10px] block leading-none">答對戰績</span>
+            <span class="font-extrabold text-emerald-700 dark:text-emerald-300" id="header-score-text">0 / 0 題</span>
+          </div>
+        </div>
+
+        <!-- 即時正確率膠囊 -->
+        <div id="badge-acc-container" class="flex items-center gap-2 bg-indigo-50/90 dark:bg-indigo-950/50 border border-indigo-200 dark:border-indigo-800/60 px-3 py-1.5 rounded-2xl shadow-xs transition-transform duration-300">
+          <div class="w-5 h-5 rounded-lg bg-indigo-500 flex items-center justify-center text-white text-xs">
+            <i data-lucide="percent" class="w-3.5 h-3.5"></i>
+          </div>
+          <div class="text-xs">
+            <div class="flex items-center justify-between gap-1 leading-none">
+              <span class="text-slate-500 dark:text-slate-400 font-medium text-[10px]">正確率</span>
+              <span class="font-extrabold text-indigo-600 dark:text-indigo-300 ml-1" id="header-accuracy-text">0%</span>
+            </div>
+            <!-- 微型進度條 -->
+            <div class="w-16 bg-indigo-200/60 dark:bg-indigo-950 h-1 rounded-full overflow-hidden mt-1">
+              <div id="header-accuracy-bar" class="bg-indigo-600 h-full w-0 transition-all duration-300"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 連勝 (Streak) 膠囊 -->
+        <div id="badge-streak-container" class="flex items-center gap-1.5 bg-amber-50/90 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800/60 px-3 py-1.5 rounded-2xl text-xs font-bold text-amber-700 dark:text-amber-300 shadow-xs transition-transform duration-300" title="當前連勝紀錄">
           <i data-lucide="flame" class="w-4 h-4 text-amber-500 fill-amber-500 animate-bounce-soft"></i>
           <span id="streak-counter">0 連勝</span>
         </div>
 
-        <button id="theme-toggle" class="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-200/60 dark:hover:bg-slate-800 transition-colors" title="切換深淺色模式">
-          <i data-lucide="moon" class="w-5 h-5 dark:hidden"></i>
-          <i data-lucide="sun" class="w-5 h-5 hidden dark:block text-amber-400"></i>
-        </button>
+        <!-- 探索詞庫量膠囊 -->
+        <div class="hidden sm:flex items-center gap-1.5 bg-purple-50/90 dark:bg-purple-950/50 border border-purple-200 dark:border-purple-800/60 px-3 py-1.5 rounded-2xl text-xs font-bold text-purple-700 dark:text-purple-300 shadow-xs" title="100單字中已練習或接觸過的不同單字數量">
+          <i data-lucide="book-open" class="w-3.5 h-3.5 text-purple-500"></i>
+          <span>已探索: <strong id="header-explored-count">0</strong>/100</span>
+        </div>
 
-        <button id="btn-stats-modal" class="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-200/60 dark:hover:bg-slate-800 transition-colors" title="查看統計與成就">
-          <i data-lucide="award" class="w-5 h-5 text-indigo-500"></i>
-        </button>
+        <!-- 桌面版設定與成就按鈕 -->
+        <div class="hidden md:flex items-center gap-1.5 ml-1">
+          <button id="theme-toggle" class="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-200/60 dark:hover:bg-slate-800 transition-colors" title="切換深淺色模式">
+            <i data-lucide="moon" class="w-4 h-4 dark:hidden"></i>
+            <i data-lucide="sun" class="w-4 h-4 hidden dark:block text-amber-400"></i>
+          </button>
+
+          <button id="btn-stats-modal" class="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-200/60 dark:hover:bg-slate-800 transition-colors" title="查看完整成就與歷史明細">
+            <i data-lucide="award" class="w-4 h-4 text-indigo-500"></i>
+          </button>
+        </div>
       </div>
     </div>
   </header>
@@ -454,6 +506,18 @@
         </div>
       </div>
 
+      <!-- 分項數據對比 (聽力 vs 口說) -->
+      <div class="grid grid-cols-2 gap-3 mb-5 p-3 rounded-2xl bg-slate-50 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 text-xs">
+        <div class="flex flex-col">
+          <span class="text-slate-400 font-semibold mb-1 flex items-center gap-1"><i data-lucide="headphones" class="w-3.5 h-3.5 text-indigo-500"></i> 聽力作答</span>
+          <span class="text-slate-700 dark:text-slate-300 font-bold" id="stat-listening-detail">答對 0 / 0 題</span>
+        </div>
+        <div class="flex flex-col">
+          <span class="text-slate-400 font-semibold mb-1 flex items-center gap-1"><i data-lucide="mic" class="w-3.5 h-3.5 text-violet-500"></i> 口說挑戰</span>
+          <span class="text-slate-700 dark:text-slate-300 font-bold" id="stat-speaking-detail">過關 0 / 0 次</span>
+        </div>
+      </div>
+
       <!-- 成就勳章列表 -->
       <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">成就勳章</h4>
       <div class="grid grid-cols-2 gap-2.5" id="badges-container">
@@ -670,7 +734,11 @@
         wrong: 0,
         streak: 0,
         bestStreak: 0,
+        listenTotal: 0,
+        listenCorrect: 0,
         speakAttempts: 0,
+        speakPass: 0,
+        exploredWordIds: [], // 已探索接觸過的獨立單字 ID 列表
         unlockedBadges: []
       },
 
@@ -698,7 +766,12 @@
         try {
           const saved = localStorage.getItem('linguapulse_stats_v1');
           if (saved) {
-            this.stats = { ...this.stats, ...JSON.parse(saved) };
+            const parsed = JSON.parse(saved);
+            this.stats = { 
+              ...this.stats, 
+              ...parsed,
+              exploredWordIds: Array.isArray(parsed.exploredWordIds) ? parsed.exploredWordIds : []
+            };
           }
         } catch (e) {
           console.error("Failed to load state", e);
@@ -713,7 +786,15 @@
         }
       },
 
-      recordAttempt(isCorrect, isSpeaking = false) {
+      markWordExplored(wordId) {
+        if (!this.stats.exploredWordIds.includes(wordId)) {
+          this.stats.exploredWordIds.push(wordId);
+          this.save();
+          updateStatsUI(false);
+        }
+      },
+
+      recordAttempt(isCorrect, isSpeaking = false, wordId = null) {
         this.stats.total++;
         if (isCorrect) {
           this.stats.correct++;
@@ -728,11 +809,21 @@
 
         if (isSpeaking) {
           this.stats.speakAttempts++;
+          if (isCorrect) this.stats.speakPass++;
+        } else {
+          this.stats.listenTotal++;
+          if (isCorrect) this.stats.listenCorrect++;
+        }
+
+        if (wordId) {
+          if (!this.stats.exploredWordIds.includes(wordId)) {
+            this.stats.exploredWordIds.push(wordId);
+          }
         }
 
         this.checkBadges();
         this.save();
-        updateStatsUI();
+        updateStatsUI(true); // 觸發頂部膠囊跳動動畫
       },
 
       checkBadges() {
@@ -741,6 +832,7 @@
           { id: 'streak_3', name: '手感火熱', desc: '達成 3 連勝', icon: 'flame', test: (s) => s.bestStreak >= 3 },
           { id: 'streak_10', name: '勢如破竹', desc: '達成 10 連勝', icon: 'award', test: (s) => s.bestStreak >= 10 },
           { id: 'orator', name: '勇敢發音家', desc: '完成 5 次口說發音挑戰', icon: 'mic', test: (s) => s.speakAttempts >= 5 },
+          { id: 'explorer_20', name: '涉獵廣泛', desc: '探索超過 20 個單字', icon: 'compass', test: (s) => s.exploredWordIds.length >= 20 },
           { id: 'master_100', name: '百詞斬常勝軍', desc: '練習次數突破 30 題', icon: 'shield-check', test: (s) => s.total >= 30 }
         ];
 
@@ -860,6 +952,7 @@
       const item = getRandomItem();
       AppState.listenQuiz.currentItem = item;
       AppState.listenQuiz.answered = false;
+      AppState.markWordExplored(item.id);
 
       // 更新分類標籤
       document.getElementById('quiz-cat-tag').textContent = getCategoryName(item.category);
@@ -908,7 +1001,7 @@
 
       const isCorrect = selectedOption.id === correctItem.id;
       SoundFX.play(isCorrect ? 'correct' : 'wrong');
-      AppState.recordAttempt(isCorrect);
+      AppState.recordAttempt(isCorrect, false, correctItem.id);
 
       // 高亮顯示所有按鈕
       const allBtns = document.querySelectorAll('.quiz-choice-btn');
@@ -939,7 +1032,7 @@
       const isCorrect = val === cleanTarget;
 
       SoundFX.play(isCorrect ? 'correct' : 'wrong');
-      AppState.recordAttempt(isCorrect);
+      AppState.recordAttempt(isCorrect, false, current.id);
 
       input.disabled = true;
       if (isCorrect) {
@@ -976,6 +1069,7 @@
     function loadNewSpeakingChallenge() {
       const item = getRandomItem();
       AppState.speaking.currentItem = item;
+      AppState.markWordExplored(item.id);
 
       document.getElementById('speak-cat-tag').textContent = getCategoryName(item.category);
       document.getElementById('speak-target-word').textContent = item.word;
@@ -1044,12 +1138,13 @@
     }
 
     function evaluateSpeakingResult(recognizedText) {
-      const target = AppState.speaking.currentItem.word;
+      const current = AppState.speaking.currentItem;
+      const target = current.word;
       const accuracy = calculateSimilarity(recognizedText, target);
       const isPass = accuracy >= 70;
 
       SoundFX.play(isPass ? 'correct' : 'wrong');
-      AppState.recordAttempt(isPass, true);
+      AppState.recordAttempt(isPass, true, current.id);
 
       // 呈現評測視窗
       const evalBox = document.getElementById('speak-evaluation');
@@ -1091,6 +1186,7 @@
         AppState.flashcard.currentIndex = 0;
       }
       const item = pool[AppState.flashcard.currentIndex];
+      AppState.markWordExplored(item.id);
 
       // 重置翻面
       AppState.flashcard.isFlipped = false;
@@ -1125,20 +1221,68 @@
     }
 
     /* -------------------------------------------------------------
-     * 10. 戰績成就與儀表板 UI 更新
+     * 10. 戰績成就與儀表板 UI 更新 (包含常駐頂部即時數據膠囊)
      * ------------------------------------------------------------- */
-    function updateStatsUI() {
+    function updateStatsUI(triggerPop = false) {
       const s = AppState.stats;
-      document.getElementById('streak-counter').textContent = `${s.streak} 連勝`;
-      document.getElementById('stat-total').textContent = s.total;
-      document.getElementById('stat-correct').textContent = s.correct;
-      document.getElementById('stat-wrong').textContent = s.wrong;
-
       const accuracy = s.total > 0 ? Math.round((s.correct / s.total) * 100) : 0;
-      document.getElementById('stat-accuracy').textContent = `${accuracy}%`;
+
+      // --- 常駐頂部導航列更新 ---
+      const headerScore = document.getElementById('header-score-text');
+      const headerAcc = document.getElementById('header-accuracy-text');
+      const headerAccBar = document.getElementById('header-accuracy-bar');
+      const headerStreak = document.getElementById('streak-counter');
+      const headerExplored = document.getElementById('header-explored-count');
+
+      if (headerScore) headerScore.textContent = `${s.correct} / ${s.total} 題`;
+      if (headerAcc) headerAcc.textContent = `${accuracy}%`;
+      if (headerAccBar) headerAccBar.style.width = `${accuracy}%`;
+      if (headerStreak) headerStreak.textContent = `${s.streak} 連勝`;
+      if (headerExplored) headerExplored.textContent = s.exploredWordIds ? s.exploredWordIds.length : 0;
+
+      // 觸發膠囊微跳動動畫
+      if (triggerPop) {
+        const scoreBadge = document.getElementById('badge-score-container');
+        const accBadge = document.getElementById('badge-acc-container');
+        const streakBadge = document.getElementById('badge-streak-container');
+
+        [scoreBadge, accBadge, streakBadge].forEach(badge => {
+          if (!badge) return;
+          badge.classList.add('scale-105');
+          setTimeout(() => badge.classList.remove('scale-105'), 220);
+        });
+      }
+
+      // --- Modal 彈窗內細部統計數據 ---
+      const statTotal = document.getElementById('stat-total');
+      const statCorrect = document.getElementById('stat-correct');
+      const statWrong = document.getElementById('stat-wrong');
+      const statAccuracy = document.getElementById('stat-accuracy');
+
+      if (statTotal) statTotal.textContent = s.total;
+      if (statCorrect) statCorrect.textContent = s.correct;
+      if (statWrong) statWrong.textContent = s.wrong;
+      if (statAccuracy) statAccuracy.textContent = `${accuracy}%`;
+
+      const listenDetail = document.getElementById('stat-listening-detail');
+      if (listenDetail) {
+        const lTot = s.listenTotal || 0;
+        const lCor = s.listenCorrect || 0;
+        const lRate = lTot > 0 ? Math.round((lCor / lTot) * 100) : 0;
+        listenDetail.textContent = `答對 ${lCor} / ${lTot} 題 (${lRate}%)`;
+      }
+
+      const speakDetail = document.getElementById('stat-speaking-detail');
+      if (speakDetail) {
+        const sTot = s.speakAttempts || 0;
+        const sPass = s.speakPass || 0;
+        const sRate = sTot > 0 ? Math.round((sPass / sTot) * 100) : 0;
+        speakDetail.textContent = `過關 ${sPass} / ${sTot} 次 (${sRate}%)`;
+      }
 
       // 渲染徽章
       const badgesContainer = document.getElementById('badges-container');
+      if (!badgesContainer) return;
       badgesContainer.innerHTML = '';
 
       const allBadges = [
@@ -1146,6 +1290,7 @@
         { id: 'streak_3', name: '手感火熱', desc: '達成 3 連勝', icon: 'flame' },
         { id: 'streak_10', name: '勢如破竹', desc: '達成 10 連勝', icon: 'award' },
         { id: 'orator', name: '發音大師', desc: '完成 5 次口說挑戰', icon: 'mic' },
+        { id: 'explorer_20', name: '涉獵廣泛', desc: '探索超過 20 個單字', icon: 'compass' },
         { id: 'master_100', name: '百詞斬常勝軍', desc: '累積練習破 30 題', icon: 'shield-check' }
       ];
 
@@ -1193,18 +1338,28 @@
         document.documentElement.classList.add('dark');
       }
 
-      // 頂部主題按鈕切換
-      document.getElementById('theme-toggle').addEventListener('click', () => {
+      // 頂部主題按鈕切換 (支援桌面與手機)
+      const toggleTheme = () => {
         SoundFX.play('click');
         document.documentElement.classList.toggle('dark');
-      });
+      };
+      document.getElementById('theme-toggle')?.addEventListener('click', toggleTheme);
+      document.getElementById('theme-toggle-mobile')?.addEventListener('click', toggleTheme);
 
       // 頂部統計視窗切換
       const statsModal = document.getElementById('stats-modal');
-      document.getElementById('btn-stats-modal').addEventListener('click', () => {
+      const openStatsModal = () => {
         SoundFX.play('click');
         updateStatsUI();
         statsModal.classList.remove('hidden');
+      };
+      document.getElementById('btn-stats-modal')?.addEventListener('click', openStatsModal);
+      document.getElementById('btn-stats-modal-mobile')?.addEventListener('click', openStatsModal);
+      document.getElementById('top-stats-bar')?.addEventListener('click', (e) => {
+        // 點擊頂部數據膠囊亦可快速檢視詳細統計
+        if (e.target.closest('#badge-score-container') || e.target.closest('#badge-acc-container') || e.target.closest('#badge-streak-container')) {
+          openStatsModal();
+        }
       });
       document.getElementById('btn-close-stats').addEventListener('click', () => {
         statsModal.classList.add('hidden');
@@ -1214,7 +1369,19 @@
       });
       document.getElementById('btn-reset-stats').addEventListener('click', () => {
         if (AppState.stats.total === 0) return;
-        AppState.stats = { total: 0, correct: 0, wrong: 0, streak: 0, bestStreak: 0, speakAttempts: 0, unlockedBadges: [] };
+        AppState.stats = { 
+          total: 0, 
+          correct: 0, 
+          wrong: 0, 
+          streak: 0, 
+          bestStreak: 0, 
+          listenTotal: 0,
+          listenCorrect: 0,
+          speakAttempts: 0, 
+          speakPass: 0,
+          exploredWordIds: [], 
+          unlockedBadges: [] 
+        };
         AppState.save();
         updateStatsUI();
       });
