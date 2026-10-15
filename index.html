@@ -1,0 +1,1400 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LinguaPulse - 現代英文聽讀特訓基地</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Google Fonts: Plus Jakarta Sans & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', '"Noto Sans TC"', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+            }
+          },
+          animation: {
+            'pulse-fast': 'pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            'bounce-soft': 'bounce 1.5s infinite',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* 玻璃擬態與精緻自訂陰影效果 */
+    .glass-card {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+    }
+    .dark .glass-card {
+      background: rgba(17, 24, 39, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    
+    /* 麥克風音波脈動動畫 */
+    @keyframes wave-pulse {
+      0% { transform: scale(1); opacity: 0.9; }
+      50% { transform: scale(1.18); opacity: 0.4; }
+      100% { transform: scale(1); opacity: 0.9; }
+    }
+    .listening-wave {
+      animation: wave-pulse 1.3s infinite ease-in-out;
+    }
+
+    /* 翻牌動畫透視設定 */
+    .perspective-1000 {
+      perspective: 1000px;
+    }
+    .transform-style-3d {
+      transform-style: preserve-3d;
+    }
+    .backface-hidden {
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+    }
+    .rotate-y-180 {
+      transform: rotateY(180deg);
+    }
+    
+    /* 捲軸美化 */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(156, 163, 175, 0.5);
+      border-radius: 9999px;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 min-h-screen flex flex-col font-sans transition-colors duration-300">
+
+  <!-- 頂部導覽列 -->
+  <header class="sticky top-0 z-50 glass-card border-b shadow-sm transition-all">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center text-white shadow-md shadow-indigo-500/30">
+          <i data-lucide="headphones" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <h1 class="text-xl font-extrabold tracking-tight bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent dark:from-indigo-400 dark:to-violet-400">
+            LinguaPulse
+          </h1>
+          <p class="text-[11px] text-slate-500 dark:text-slate-400 font-medium tracking-wide">現代英文聽讀特訓基地</p>
+        </div>
+      </div>
+
+      <!-- 連勝指標與快速切換 -->
+      <div class="flex items-center gap-3">
+        <div class="flex items-center gap-1.5 bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800/60 px-3 py-1.5 rounded-full text-xs font-bold text-amber-700 dark:text-amber-300 shadow-sm" title="當前連勝紀錄">
+          <i data-lucide="flame" class="w-4 h-4 text-amber-500 fill-amber-500 animate-bounce-soft"></i>
+          <span id="streak-counter">0 連勝</span>
+        </div>
+
+        <button id="theme-toggle" class="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-200/60 dark:hover:bg-slate-800 transition-colors" title="切換深淺色模式">
+          <i data-lucide="moon" class="w-5 h-5 dark:hidden"></i>
+          <i data-lucide="sun" class="w-5 h-5 hidden dark:block text-amber-400"></i>
+        </button>
+
+        <button id="btn-stats-modal" class="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-200/60 dark:hover:bg-slate-800 transition-colors" title="查看統計與成就">
+          <i data-lucide="award" class="w-5 h-5 text-indigo-500"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- 主容器 -->
+  <main class="flex-1 max-w-5xl w-full mx-auto p-4 md:p-6 flex flex-col gap-6">
+
+    <!-- 模式選擇 Tab Bar -->
+    <div class="grid grid-cols-3 gap-2 p-1.5 bg-slate-200/80 dark:bg-slate-900/80 rounded-2xl shadow-inner max-w-xl mx-auto w-full">
+      <button data-mode="listen" class="nav-tab active flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl font-semibold text-xs md:text-sm transition-all duration-200 bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 shadow-sm">
+        <i data-lucide="volume-2" class="w-4 h-4"></i>
+        <span>聽力測驗</span>
+      </button>
+      <button data-mode="speak" class="nav-tab flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl font-semibold text-xs md:text-sm transition-all duration-200 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200">
+        <i data-lucide="mic" class="w-4 h-4"></i>
+        <span>口說挑戰</span>
+      </button>
+      <button data-mode="cards" class="nav-tab flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl font-semibold text-xs md:text-sm transition-all duration-200 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200">
+        <i data-lucide="layers" class="w-4 h-4"></i>
+        <span>單字庫探索</span>
+      </button>
+    </div>
+
+    <!-- 難度與主題分類過濾器 -->
+    <div class="flex flex-wrap items-center justify-between gap-3 text-xs md:text-sm">
+      <div class="flex items-center gap-2 overflow-x-auto pb-1 max-w-full">
+        <span class="text-slate-500 dark:text-slate-400 font-medium whitespace-nowrap"><i data-lucide="filter" class="w-3.5 h-3.5 inline mr-1"></i>分類:</span>
+        <button class="cat-pill active px-3 py-1 rounded-full font-medium transition bg-indigo-600 text-white" data-cat="all">全部 (100)</button>
+        <button class="cat-pill px-3 py-1 rounded-full font-medium transition bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-700" data-cat="slang">生活俚語</button>
+        <button class="cat-pill px-3 py-1 rounded-full font-medium transition bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-700" data-cat="business">職場商務</button>
+        <button class="cat-pill px-3 py-1 rounded-full font-medium transition bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-700" data-cat="tech">科技潮詞</button>
+        <button class="cat-pill px-3 py-1 rounded-full font-medium transition bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-700" data-cat="emotion">社交情感</button>
+      </div>
+
+      <!-- 發音語速調節 -->
+      <div class="flex items-center gap-2 bg-white dark:bg-slate-900 px-3 py-1 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 ml-auto">
+        <span class="text-slate-500 dark:text-slate-400 text-xs">語速:</span>
+        <button id="btn-speed-normal" class="text-xs px-2 py-0.5 rounded font-bold bg-indigo-100 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300">1.0x</button>
+        <button id="btn-speed-slow" class="text-xs px-2 py-0.5 rounded font-medium text-slate-500 dark:text-slate-400 hover:text-slate-800">0.75x</button>
+      </div>
+    </div>
+
+    <!-- 瀏覽器支援警告提示條 -->
+    <div id="speech-support-alert" class="hidden rounded-xl p-3 bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800/50 text-amber-800 dark:text-amber-200 text-xs md:text-sm flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <i data-lucide="alert-triangle" class="w-4 h-4 text-amber-600 flex-shrink-0"></i>
+        <span>提醒：此瀏覽器未完整支援語音辨識（建議使用 Chrome / Edge 體驗口說評分功能）。</span>
+      </div>
+      <button onclick="this.parentElement.remove()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 ml-2">✕</button>
+    </div>
+
+    <!-- ================= 模式 1: 聽力辨識測驗 (Listening Quiz) ================= -->
+    <section id="section-listen" class="mode-view flex flex-col items-center">
+      <div class="w-full max-w-xl glass-card rounded-3xl p-6 md:p-8 shadow-xl relative overflow-hidden flex flex-col items-center">
+        <!-- 題型切換 (選擇 / 聽寫拼字) -->
+        <div class="flex items-center justify-between w-full mb-6 text-xs">
+          <span class="bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 font-semibold px-2.5 py-1 rounded-full" id="quiz-cat-tag">生活俚語</span>
+          <div class="flex items-center gap-2">
+            <button id="btn-listen-mode-toggle" class="text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 flex items-center gap-1 font-medium transition">
+              <i data-lucide="keyboard" class="w-3.5 h-3.5"></i>
+              <span id="quiz-mode-label">切換為拼字聽寫</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 播放大按鈕 -->
+        <div class="my-4 relative group">
+          <div class="absolute -inset-2 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full blur-md opacity-30 group-hover:opacity-75 transition duration-300"></div>
+          <button id="btn-play-audio" class="relative w-24 h-24 rounded-full bg-gradient-to-tr from-indigo-600 to-violet-600 text-white flex flex-col items-center justify-center shadow-lg hover:scale-105 active:scale-95 transition-all">
+            <i data-lucide="volume-2" class="w-10 h-10"></i>
+            <span class="text-[10px] font-bold tracking-wider mt-0.5">點擊聆聽</span>
+          </button>
+        </div>
+
+        <p class="text-xs text-slate-400 mb-6 flex items-center gap-1">
+          <i data-lucide="info" class="w-3.5 h-3.5"></i>
+          仔細聽出讀音，找出對應的正確單字或片語
+        </p>
+
+        <!-- 選擇題選項容器 -->
+        <div id="quiz-choices-container" class="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full">
+          <!-- 動態產生 4 個選項按鈕 -->
+        </div>
+
+        <!-- 拼字模式容器 (預設隱藏) -->
+        <div id="quiz-spelling-container" class="hidden w-full flex flex-col gap-3">
+          <div class="relative">
+            <input type="text" id="spelling-input" placeholder="請輸入聽到的單字或片語..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+              class="w-full px-4 py-3.5 rounded-2xl border border-slate-300 dark:border-slate-700 bg-white/70 dark:bg-slate-900/70 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-center font-bold tracking-wide text-lg text-slate-800 dark:text-white transition">
+          </div>
+          <div class="flex gap-2">
+            <button id="btn-submit-spelling" class="flex-1 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-md transition active:scale-98">
+              確認答案
+            </button>
+            <button id="btn-hint-spelling" class="px-4 py-3 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold rounded-xl transition" title="取得首字母提示">
+              提示
+            </button>
+          </div>
+          <p id="spelling-hint-text" class="text-xs text-center text-amber-600 dark:text-amber-400 min-h-[1rem]"></p>
+        </div>
+
+        <!-- 答題反饋卡 (揭曉結果後顯示) -->
+        <div id="quiz-result-feedback" class="hidden mt-6 w-full p-4 rounded-2xl border transition-all duration-300">
+          <div class="flex items-start justify-between">
+            <div>
+              <div class="flex items-center gap-2">
+                <span id="quiz-word-display" class="font-bold text-xl text-slate-900 dark:text-white">Word</span>
+                <span id="quiz-phonetic-display" class="text-xs text-slate-500 dark:text-slate-400 font-mono">/wɜːd/</span>
+                <span id="quiz-pos-display" class="text-[10px] uppercase font-bold px-1.5 py-0.5 rounded bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300">n.</span>
+              </div>
+              <p id="quiz-meaning-display" class="text-sm font-medium text-slate-700 dark:text-slate-200 mt-1">中文解釋</p>
+              <p id="quiz-example-display" class="text-xs text-slate-500 dark:text-slate-400 italic mt-2">Example sentence goes here.</p>
+            </div>
+            <button id="btn-play-example" class="p-2 rounded-xl bg-indigo-100 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 hover:scale-110 transition" title="播放例句">
+              <i data-lucide="volume-1" class="w-4 h-4"></i>
+            </button>
+          </div>
+
+          <div class="mt-4 flex justify-end">
+            <button id="btn-next-listen" class="flex items-center gap-1.5 px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-bold rounded-xl shadow-md transition transform active:scale-95 text-sm">
+              <span>下一題</span>
+              <i data-lucide="chevron-right" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= 模式 2: 口說發音挑戰 (Speaking Challenge) ================= -->
+    <section id="section-speak" class="mode-view hidden flex flex-col items-center">
+      <div class="w-full max-w-xl glass-card rounded-3xl p-6 md:p-8 shadow-xl flex flex-col items-center">
+        <!-- 標籤與難易度 -->
+        <div class="w-full flex justify-between items-center mb-4">
+          <span id="speak-cat-tag" class="bg-violet-100 dark:bg-violet-950/60 text-violet-700 dark:text-violet-300 font-bold px-3 py-1 rounded-full text-xs">科技潮詞</span>
+          <span class="text-xs text-slate-400">大聲唸出卡片中的單字或句子</span>
+        </div>
+
+        <!-- 目標單字卡片 -->
+        <div class="w-full text-center py-6 px-4 bg-gradient-to-b from-indigo-50/50 to-transparent dark:from-slate-900/40 rounded-2xl border border-indigo-100/50 dark:border-slate-800 mb-6">
+          <div class="flex items-center justify-center gap-2 mb-1">
+            <h2 id="speak-target-word" class="text-3xl md:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+              Prompt Engineering
+            </h2>
+            <button id="btn-speak-listen-ref" class="p-2 text-indigo-500 hover:text-indigo-700 dark:hover:text-indigo-300 transition" title="示範標準發音">
+              <i data-lucide="volume-2" class="w-6 h-6"></i>
+            </button>
+          </div>
+          <div class="text-slate-500 dark:text-slate-400 font-mono text-sm mb-2" id="speak-target-phonetic">/prɒmpt ˌɛndʒɪˈnɪərɪŋ/</div>
+          <div class="text-slate-700 dark:text-slate-300 font-medium text-base mb-3" id="speak-target-meaning">提示詞工程</div>
+          <div class="text-xs md:text-sm text-slate-500 dark:text-slate-400 italic bg-white/60 dark:bg-slate-900/60 p-2.5 rounded-xl border border-slate-200/50 dark:border-slate-800" id="speak-target-example">
+            "Prompt engineering is a key skill for working with generative AI."
+          </div>
+        </div>
+
+        <!-- 錄音控制區塊 -->
+        <div class="flex flex-col items-center gap-3 my-2">
+          <div class="relative">
+            <!-- 錄音中的波紋指示器 -->
+            <div id="mic-pulse-ring" class="hidden absolute -inset-3 rounded-full bg-red-500/20 listening-wave"></div>
+            
+            <button id="btn-mic" class="relative w-20 h-20 rounded-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 flex items-center justify-center shadow-lg hover:scale-105 active:scale-95 transition duration-200">
+              <i id="mic-icon" data-lucide="mic" class="w-8 h-8"></i>
+            </button>
+          </div>
+          <span id="mic-status-label" class="text-xs font-semibold text-slate-500 dark:text-slate-400">點擊麥克風開始朗讀</span>
+        </div>
+
+        <!-- 辨識成果與評分回饋 -->
+        <div id="speak-evaluation" class="w-full mt-6 hidden">
+          <div class="p-4 rounded-2xl bg-white/80 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col gap-3">
+            <div class="flex items-center justify-between border-b pb-2 dark:border-slate-800">
+              <span class="text-xs font-medium text-slate-500">辨識結果:</span>
+              <span id="speak-score-stars" class="text-amber-500 text-sm font-bold flex gap-0.5">★★★</span>
+            </div>
+
+            <div class="text-center py-2">
+              <p class="text-xs text-slate-400 mb-1">系統聽到了：</p>
+              <p id="speak-recognized-text" class="text-lg font-bold text-slate-800 dark:text-slate-100">"..."</p>
+            </div>
+
+            <!-- 精確度進度條 -->
+            <div>
+              <div class="flex justify-between text-xs font-semibold mb-1">
+                <span>準確度匹配 (Accuracy)</span>
+                <span id="speak-accuracy-pct" class="text-indigo-600 dark:text-indigo-400">92%</span>
+              </div>
+              <div class="w-full bg-slate-200 dark:bg-slate-700 h-2.5 rounded-full overflow-hidden">
+                <div id="speak-accuracy-bar" class="bg-indigo-600 h-full rounded-full transition-all duration-500" style="width: 90%"></div>
+              </div>
+            </div>
+
+            <p id="speak-feedback-comment" class="text-xs text-center font-medium mt-1">發音非常清晰且精準！棒極了！</p>
+          </div>
+
+          <div class="mt-4 flex justify-between items-center">
+            <button id="btn-speak-retry" class="px-4 py-2 text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-xl transition">
+              再試一次
+            </button>
+            <button id="btn-next-speak" class="flex items-center gap-1.5 px-5 py-2.5 bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-bold rounded-xl shadow-md transition transform active:scale-95 text-sm">
+              <span>下一題</span>
+              <i data-lucide="chevron-right" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= 模式 3: 單字卡探索 (Interactive Flashcards) ================= -->
+    <section id="section-cards" class="mode-view hidden flex flex-col items-center">
+      <div class="w-full max-w-xl">
+        
+        <!-- 頂部卡片控制器與進度 -->
+        <div class="flex justify-between items-center mb-4 px-2">
+          <div class="text-xs font-semibold text-slate-500 dark:text-slate-400">
+            卡片進度：<span id="card-index-indicator" class="text-indigo-600 dark:text-indigo-400 font-bold">1 / 100</span>
+          </div>
+          <button id="btn-random-card" class="flex items-center gap-1 text-xs text-indigo-600 dark:text-indigo-400 font-semibold hover:underline">
+            <i data-lucide="shuffle" class="w-3.5 h-3.5"></i>
+            隨機抽取
+          </button>
+        </div>
+
+        <!-- 3D 翻轉卡片容器 -->
+        <div class="perspective-1000 w-full h-80 cursor-pointer select-none" id="flashcard-container">
+          <div id="flashcard-inner" class="relative w-full h-full duration-500 transform-style-3d shadow-xl rounded-3xl">
+            
+            <!-- 卡片正面 (英文) -->
+            <div class="absolute inset-0 w-full h-full rounded-3xl glass-card p-6 flex flex-col justify-between backface-hidden border-2 border-indigo-200/60 dark:border-indigo-900/50">
+              <div class="flex justify-between items-start">
+                <span id="fc-category" class="text-[11px] font-bold tracking-wider uppercase px-2.5 py-1 bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-300 rounded-full">
+                  職場商務
+                </span>
+                <span class="text-xs text-slate-400 flex items-center gap-1"><i data-lucide="repeat" class="w-3 h-3"></i> 點擊翻轉看釋義</span>
+              </div>
+
+              <div class="text-center my-auto">
+                <h3 id="fc-word" class="text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">Touch Base</h3>
+                <p id="fc-phonetic" class="text-slate-500 font-mono text-sm mt-1.5">/tʌtʃ beɪs/</p>
+                <span id="fc-pos" class="inline-block mt-2 text-xs font-semibold text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded">phrase</span>
+              </div>
+
+              <div class="flex items-center justify-between pt-4 border-t border-slate-200/50 dark:border-slate-800">
+                <button class="btn-card-audio flex items-center gap-1.5 text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800">
+                  <i data-lucide="volume-2" class="w-4 h-4"></i> 播放發音
+                </button>
+                <span class="text-[11px] text-slate-400">LinguaPulse Vocabulary 100</span>
+              </div>
+            </div>
+
+            <!-- 卡片背面 (中文解釋與例句) -->
+            <div class="absolute inset-0 w-full h-full rounded-3xl glass-card p-6 flex flex-col justify-between backface-hidden rotate-y-180 border-2 border-violet-200/60 dark:border-violet-900/50 bg-gradient-to-tr from-slate-50 to-indigo-50/40 dark:from-slate-900 dark:to-indigo-950/40">
+              <div class="flex justify-between items-start">
+                <span class="text-[11px] font-bold text-violet-600 dark:text-violet-400 bg-violet-50 dark:bg-violet-950/60 px-2.5 py-1 rounded-full">中文解析</span>
+                <span class="text-xs text-slate-400 flex items-center gap-1"><i data-lucide="repeat" class="w-3 h-3"></i> 點擊翻回正面</span>
+              </div>
+
+              <div class="my-auto">
+                <h4 id="fc-meaning" class="text-xl md:text-2xl font-bold text-slate-900 dark:text-white text-center mb-3">與某人聯繫、交流進度</h4>
+                <div class="bg-white/80 dark:bg-slate-900/80 p-3.5 rounded-2xl border border-slate-200/60 dark:border-slate-800">
+                  <div class="flex justify-between items-center mb-1">
+                    <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">實用例句</span>
+                    <button class="btn-card-sentence-audio text-slate-500 hover:text-indigo-600" title="朗讀例句">
+                      <i data-lucide="volume-1" class="w-3.5 h-3.5"></i>
+                    </button>
+                  </div>
+                  <p id="fc-example" class="text-xs md:text-sm text-slate-700 dark:text-slate-300 italic">"Let's touch base next Monday to review the project status."</p>
+                  <p id="fc-example-trans" class="text-xs text-slate-500 dark:text-slate-400 mt-1">「我們下週一碰面交流一下，檢視專案進度。」</p>
+                </div>
+              </div>
+
+              <div class="text-center text-[11px] text-slate-400">
+                可使用下方切換鍵瀏覽前後單字
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- 卡片翻頁導航 -->
+        <div class="flex items-center justify-center gap-4 mt-6">
+          <button id="btn-prev-card" class="p-3 rounded-2xl glass-card hover:bg-slate-200 dark:hover:bg-slate-800 transition active:scale-95 shadow-sm text-slate-700 dark:text-slate-200">
+            <i data-lucide="arrow-left" class="w-5 h-5"></i>
+          </button>
+          <button id="btn-flip-card" class="px-6 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm shadow-md transition active:scale-95">
+            翻轉卡片
+          </button>
+          <button id="btn-next-card" class="p-3 rounded-2xl glass-card hover:bg-slate-200 dark:hover:bg-slate-800 transition active:scale-95 shadow-sm text-slate-700 dark:text-slate-200">
+            <i data-lucide="arrow-right" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- 統計與成就浮動對話視窗 (Modal) -->
+  <div id="stats-modal" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="glass-card max-w-lg w-full rounded-3xl p-6 shadow-2xl border border-white/20 dark:border-slate-800 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between pb-4 border-b dark:border-slate-800">
+        <div class="flex items-center gap-2">
+          <i data-lucide="trophy" class="w-6 h-6 text-amber-500"></i>
+          <h3 class="text-lg font-bold text-slate-900 dark:text-white">學習戰績與榮譽殿堂</h3>
+        </div>
+        <button id="btn-close-stats" class="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-600">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- 統計數據網格 -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 my-5">
+        <div class="p-3 rounded-2xl bg-slate-100 dark:bg-slate-900/60 text-center">
+          <div class="text-[11px] font-medium text-slate-500">練習總數</div>
+          <div id="stat-total" class="text-2xl font-black text-slate-800 dark:text-slate-100 mt-0.5">0</div>
+        </div>
+        <div class="p-3 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 text-center">
+          <div class="text-[11px] font-medium text-emerald-600 dark:text-emerald-400">正確答對</div>
+          <div id="stat-correct" class="text-2xl font-black text-emerald-600 dark:text-emerald-400 mt-0.5">0</div>
+        </div>
+        <div class="p-3 rounded-2xl bg-rose-50 dark:bg-rose-950/40 text-center">
+          <div class="text-[11px] font-medium text-rose-600 dark:text-rose-400">需要加強</div>
+          <div id="stat-wrong" class="text-2xl font-black text-rose-600 dark:text-rose-400 mt-0.5">0</div>
+        </div>
+        <div class="p-3 rounded-2xl bg-indigo-50 dark:bg-indigo-950/40 text-center">
+          <div class="text-[11px] font-medium text-indigo-600 dark:text-indigo-400">整體正確率</div>
+          <div id="stat-accuracy" class="text-2xl font-black text-indigo-600 dark:text-indigo-400 mt-0.5">0%</div>
+        </div>
+      </div>
+
+      <!-- 成就勳章列表 -->
+      <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">成就勳章</h4>
+      <div class="grid grid-cols-2 gap-2.5" id="badges-container">
+        <!-- 動態徽章生成 -->
+      </div>
+
+      <div class="mt-6 flex justify-between items-center pt-4 border-t dark:border-slate-800">
+        <button id="btn-reset-stats" class="text-xs text-rose-500 hover:underline">重置練習數據</button>
+        <button id="btn-done-stats" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs">完成</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 頁尾 -->
+  <footer class="mt-auto py-4 text-center text-xs text-slate-400 border-t border-slate-200/60 dark:border-slate-900">
+    <p>LinguaPulse &bull; 打造更自然的雙向英文聽讀直覺 &bull; 支援 Web Speech API</p>
+  </footer>
+
+  <!-- ================= 核心邏輯 JavaScript ================= -->
+  <script>
+    /* -------------------------------------------------------------
+     * 1. 100 個實用生動且情境豐富的英文單字與道地片語資料庫
+     * ------------------------------------------------------------- */
+    const VOCAB_DATABASE = [
+      // === 生活俚語 & 口語 (25 題) ===
+      { id: 1, word: "No-brainer", phonetic: "/noʊˈbreɪnər/", pos: "noun", meaning: "顯而易見的事情、不用想都知道的事", example: "Taking that job offer with double salary is a total no-brainer.", exampleTrans: "接受那份薪水翻倍的工作完全是不需要猶豫的決定。", category: "slang" },
+      { id: 2, word: "Bite the bullet", phonetic: "/baɪt ðə ˈbʊlɪt/", pos: "phrase", meaning: "咬緊牙關硬著頭皮去做", example: "I hate dentist visits, but I just have to bite the bullet.", exampleTrans: "我討厭看牙醫，但只能咬緊牙關硬上了。", category: "slang" },
+      { id: 3, word: "Spill the tea", phonetic: "/spɪl ðə tiː/", pos: "phrase", meaning: "八卦一下、說出真相或內幕", example: "Come on, spill the tea! What happened at the party last night?", exampleTrans: "快點爆料！昨晚派對到底發生什麼事了？", category: "slang" },
+      { id: 4, word: "Under the weather", phonetic: "/ˈʌndər ðə ˈwɛðər/", pos: "phrase", meaning: "身體稍微不適、微恙", example: "I'm feeling a bit under the weather today, so I'll stay home.", exampleTrans: "我今天身體有點不太舒服，所以打算留在家。", category: "slang" },
+      { id: 5, word: "Hit the sack", phonetic: "/hɪt ðə sæk/", pos: "phrase", meaning: "上床睡覺、就寢", example: "It's past midnight; I'm ready to hit the sack.", exampleTrans: "已經過午夜了，我準備去睡大覺了。", category: "slang" },
+      { id: 6, word: "Couch potato", phonetic: "/kaʊtʃ pəˈteɪtoʊ/", pos: "noun", meaning: "整天窩在沙發上看電視的人", example: "Don't be a couch potato all weekend; let's go for a hike.", exampleTrans: "別整週末都窩在沙發發懶，我們去健行吧。", category: "slang" },
+      { id: 7, word: "Cut corners", phonetic: "/kʌt ˈkɔːrnərz/", pos: "phrase", meaning: "偷工減料、圖省事草率行事", example: "Never cut corners when it comes to safety equipment.", exampleTrans: "涉及安全配備時，絕對不能偷工減料。", category: "slang" },
+      { id: 8, word: "Piece of cake", phonetic: "/piːs əv keɪk/", pos: "phrase", meaning: "易如反掌、小菜一碟", example: "That math exam was a piece of cake for her.", exampleTrans: "那場數學考試對她來說簡直易如反掌。", category: "slang" },
+      { id: 9, word: "Break a leg", phonetic: "/breɪk ə lɛɡ/", pos: "phrase", meaning: "祝演出成功、祝好運", example: "You're going on stage now—break a leg!", exampleTrans: "你要登台了——祝演出順利大獲成功！", category: "slang" },
+      { id: 10, word: "Once in a blue moon", phonetic: "/wʌns ɪn ə bluː muːn/", pos: "phrase", meaning: "千載難逢、極為罕見", example: "He visits his hometown once in a blue moon.", exampleTrans: "他極其偶爾才會回老家一趟。", category: "slang" },
+      { id: 11, word: "Cost an arm and a leg", phonetic: "/kɔːst ən ɑːrm ənd ə lɛɡ/", pos: "phrase", meaning: "價格極其昂貴、索價不菲", example: "That designer coat costs an arm and a leg.", exampleTrans: "那件名牌大衣貴得要命。", category: "slang" },
+      { id: 12, word: "Rain check", phonetic: "/reɪn tʃɛk/", pos: "phrase", meaning: "改天再約、延期履行", example: "Can I take a rain check on dinner? I'm swamped tonight.", exampleTrans: "晚餐能改天再約嗎？我今晚忙翻了。", category: "slang" },
+      { id: 13, word: "Call it a day", phonetic: "/kɔːl ɪt ə deɪ/", pos: "phrase", meaning: "今天就到此為止、收工", example: "We've made good progress; let's call it a day.", exampleTrans: "我們進展不錯，今天就到此收工吧。", category: "slang" },
+      { id: 14, word: "Up in the air", phonetic: "/ʌp ɪn ði ɛər/", pos: "phrase", meaning: "尚未定案、懸而未決", example: "Our travel plans are still up in the air due to the typhoon.", exampleTrans: "因為颱風的關係，我們的旅行計畫依然懸而未決。", category: "slang" },
+      { id: 15, word: "Ring a bell", phonetic: "/rɪŋ ə bɛl/", pos: "phrase", meaning: "聽起來耳熟、有點印象", example: "His name rings a bell, but I can't place his face.", exampleTrans: "他的名字聽起來很耳熟，但我記不起長相。", category: "slang" },
+      { id: 16, word: "Blow off steam", phonetic: "/bloʊ ɔːf stiːm/", pos: "phrase", meaning: "發洩情緒、舒緩壓力", example: "Jogging after work helps me blow off steam.", exampleTrans: "下班後慢跑能幫我抒發壓力。", category: "slang" },
+      { id: 17, word: "Cut to the chase", phonetic: "/kʌt tə ðə tʃeɪs/", pos: "phrase", meaning: "開門見山、切入重點", example: "We don't have much time, so let's cut to the chase.", exampleTrans: "我們時間不多，直接切入重點吧。", category: "slang" },
+      { id: 18, word: "Out of the blue", phonetic: "/aʊt əv ðə bluː/", pos: "phrase", meaning: "出乎意料地、突如其來", example: "She called me out of the blue after five years.", exampleTrans: "五年沒聯絡的她突然打電話給我。", category: "slang" },
+      { id: 19, word: "Sit on the fence", phonetic: "/sɪt ɑːn ðə fɛns/", pos: "phrase", meaning: "持觀望態度、優柔寡斷不表態", example: "You can't sit on the fence forever; make a decision.", exampleTrans: "你不能永遠觀望猶豫不決，快做決定。", category: "slang" },
+      { id: 20, word: "Pull someone's leg", phonetic: "/pʊl ˈsʌmwʌnz lɛɡ/", pos: "phrase", meaning: "開某人玩笑、鬧著玩", example: "Relax, I didn't lose your keys, I'm just pulling your leg.", exampleTrans: "放輕鬆，我沒弄丟你鑰匙，只是跟你開玩笑。", category: "slang" },
+      { id: 21, word: "Hang in there", phonetic: "/hæŋ ɪn ðɛər/", pos: "phrase", meaning: "堅持下去、挺住", example: "Hang in there! Things will get better soon.", exampleTrans: "堅持住！情況很快就會好轉的。", category: "slang" },
+      { id: 22, word: "See eye to eye", phonetic: "/siː aɪ tu aɪ/", pos: "phrase", meaning: "看法一致、意見相合", example: "My partner and I don't always see eye to eye on design.", exampleTrans: "我和夥伴在設計風格上並不總是意見一致。", category: "slang" },
+      { id: 23, word: "Burn the midnight oil", phonetic: "/bɜːrn ðə ˈmɪdnaɪt ɔɪl/", pos: "phrase", meaning: "熬夜工作或念書", example: "The exam is tomorrow, so he's burning the midnight oil.", exampleTrans: "明天就要考試了，所以他正在挑燈夜戰。", category: "slang" },
+      { id: 24, word: "Play it by ear", phonetic: "/pleɪ ɪt baɪ ɪər/", pos: "phrase", meaning: "見機行事、隨機應變", example: "We don't have reservations, so let's just play it by ear.", exampleTrans: "我們沒訂位，就看著辦隨機應變吧。", category: "slang" },
+      { id: 25, word: "Hit the nail on the head", phonetic: "/hɪt ðə neɪl ɑːn ðə hɛd/", pos: "phrase", meaning: "一針見血、切中要害", example: "Your analysis really hit the nail on the head.", exampleTrans: "你的分析真是切中要害、一針見血。", category: "slang" },
+
+      // === 職場商務 & 專業情境 (25 題) ===
+      { id: 26, word: "Touch base", phonetic: "/tʌtʃ beɪs/", pos: "phrase", meaning: "跟某人簡短聯繫或溝通進度", example: "Let's touch base next Monday to review the campaign.", exampleTrans: "我們下週一先碰個頭過一下活動進展。", category: "business" },
+      { id: 27, word: "Bandwidth", phonetic: "/ˈbændwɪdθ/", pos: "noun", meaning: "(比喻) 時間精力或心力餘裕", example: "I'd love to take on this project, but I don't have the bandwidth.", exampleTrans: "我很想接下這個專案，但我目前實在抽不出心力。", category: "business" },
+      { id: 28, word: "Actionable", phonetic: "/ˈækʃənəbl/", pos: "adj", meaning: "具體可落實執行的", example: "Please give us actionable feedback rather than vague ideas.", exampleTrans: "請給我們具體可執行的回饋，而不是模糊的概念。", category: "business" },
+      { id: 29, word: "Synergy", phonetic: "/ˈsɪnərdʒi/", pos: "noun", meaning: "協同效應、綜效 (1+1>2)", example: "The merger created strong synergy between both brands.", exampleTrans: "這次合併為兩個品牌創造了強大的綜效。", category: "business" },
+      { id: 30, word: "Streamline", phonetic: "/ˈstriːmlaɪn/", pos: "verb", meaning: "簡化流程以提高效率", example: "We need to streamline our onboarding process for new hires.", exampleTrans: "我們需要精簡並優化新進員工的入職流程。", category: "business" },
+      { id: 31, word: "Deliverable", phonetic: "/dɪˈlɪvərəbl/", pos: "noun", meaning: "工作交付成果、繳交項目", example: "The final deliverable is due at 5 PM this Friday.", exampleTrans: "最終成果物必須在週五下午五點前交付。", category: "business" },
+      { id: 32, word: "Bottleneck", phonetic: "/ˈbɑːtlnek/", pos: "noun", meaning: "瓶頸、卡關處", example: "Quality assurance is currently the bottleneck in our pipeline.", exampleTrans: "品質測試目前是我們整個流程中的瓶頸。", category: "business" },
+      { id: 33, word: "Circle back", phonetic: "/ˈsɜːrkl bæk/", pos: "phrase", meaning: "稍後再回來討論或處理", example: "Let's table this topic and circle back to it tomorrow.", exampleTrans: "這議題我們先擱置，明天再來回頭討論。", category: "business" },
+      { id: 34, word: "Takeaway", phonetic: "/ˈteɪkəweɪ/", pos: "noun", meaning: "重點收穫、心得心得", example: "What was your main takeaway from the keynote speech?", exampleTrans: "你從這場主題演講中獲得的最大收穫是什麼？", category: "business" },
+      { id: 35, word: "Move the needle", phonetic: "/muːv ðə ˈniːdl/", pos: "phrase", meaning: "產生實質重大影響或顯著改變", example: "This minor tweak won't really move the needle on conversions.", exampleTrans: "這點微調並不會為轉換率帶來顯著的提升突破。", category: "business" },
+      { id: 36, word: "Deep dive", phonetic: "/diːp daɪv/", pos: "noun", meaning: "深度剖析、深入調查探討", example: "Tomorrow we'll do a deep dive into user retention metrics.", exampleTrans: "明天我們將對使用者留存數據進行深度剖析。", category: "business" },
+      { id: 37, word: "Stakeholder", phonetic: "/ˈsteɪkhoʊldər/", pos: "noun", meaning: "利害關係人、專案相關方", example: "All key stakeholders agreed with the proposed budget.", exampleTrans: "所有重要利害關係人都同意了這份提案預算。", category: "business" },
+      { id: 38, word: "Pain point", phonetic: "/peɪn pɔɪnt/", pos: "noun", meaning: "痛點、困擾與急迫需求", example: "Our new feature directly addresses the user's biggest pain point.", exampleTrans: "我們的新功能直接解決了使用者最大的痛點。", category: "business" },
+      { id: 39, word: "Scalable", phonetic: "/ˈskeɪləbl/", pos: "adj", meaning: "具擴展性、可規模化的", example: "Cloud architecture makes the system highly scalable.", exampleTrans: "雲端架構讓這套系統具備極高的可擴充規模能力。", category: "business" },
+      { id: 40, word: "Pivot", phonetic: "/ˈpɪvət/", pos: "verb/noun", meaning: "(策略性) 轉型、變更營運方向", example: "The startup had to pivot to B2B software to survive.", exampleTrans: "這家新創公司必須轉型發展 B2B 軟體才能生存。", category: "business" },
+      { id: 41, word: "Low-hanging fruit", phonetic: "/loʊ ˈhæŋɪŋ fruːt/", pos: "noun", meaning: "容易達成且回報快的小目標", example: "Fixing image compression is low-hanging fruit for page speed.", exampleTrans: "修復圖片壓縮是提升網頁速度最唾手可得的好處。", category: "business" },
+      { id: 42, word: "Benchmark", phonetic: "/ˈbentʃmɑːrk/", pos: "noun/verb", meaning: "基準指標、參照評測", example: "We use their performance as a benchmark for our team.", exampleTrans: "我們以他們的績效作為我們團隊的衡量基準。", category: "business" },
+      { id: 43, word: "Runway", phonetic: "/ˈrʌnweɪ/", pos: "noun", meaning: "(新創) 資金跑道、現有資金可支撐月數", example: "With current spending, our runway is about twelve months.", exampleTrans: "以目前的開銷，我們的資金跑道大約還能撐十二個月。", category: "business" },
+      { id: 44, word: "Value proposition", phonetic: "/ˈvæljuː ˌprɑːpəˈzɪʃn/", pos: "noun", meaning: "價值主張、核心優勢賣點", example: "What is the unique value proposition of your product?", exampleTrans: "你們這款產品的獨特價值主張是什麼？", category: "business" },
+      { id: 45, word: "On the same page", phonetic: "/ɑːn ðə seɪm peɪdʒ/", pos: "phrase", meaning: "達成共識、步調認知一致", example: "Before signing, let's ensure we are all on the same page.", exampleTrans: "簽約前，讓我們先確保大家認知步調一致。", category: "business" },
+      { id: 46, word: "Due diligence", phonetic: "/duː ˈdɪlɪdʒəns/", pos: "noun", meaning: "盡職調查、審慎評估", example: "Investors will perform thorough due diligence before funding.", exampleTrans: "投資人在注資前會進行嚴謹的盡職調查。", category: "business" },
+      { id: 47, word: "Elevator pitch", phonetic: "/ˈelɪveɪtər pɪtʃ/", pos: "noun", meaning: "電梯演說（短時間吸引人的提案）", example: "Give me your two-minute elevator pitch.", exampleTrans: "給我一個兩分鐘的精簡電梯簡報。", category: "business" },
+      { id: 48, word: "Core competency", phonetic: "/kɔːr ˈkɑːmpɪtənsi/", pos: "noun", meaning: "核心競爭力", example: "Fast customer support is our core competency.", exampleTrans: "即時快速的客戶服務是我們的核心競爭力。", category: "business" },
+      { id: 49, word: "Milestone", phonetic: "/ˈmaɪlstoʊn/", pos: "noun", meaning: "里程碑、重大進展階段", example: "Reaching 10,000 paid subscribers is a huge milestone.", exampleTrans: "達到一萬名付費訂閱用戶是一大重要里程碑。", category: "business" },
+      { id: 50, word: "Buy-in", phonetic: "/ˈbaɪ ɪn/", pos: "noun", meaning: "認同支持、贊同入局", example: "We need executive buy-in before proceeding with the strategy.", exampleTrans: "在執行這項策略前，我們需要獲得高層主管的認可與支持。", category: "business" },
+
+      // === 科技潮詞 & AI 時代新用語 (25 題) ===
+      { id: 51, word: "Prompt engineering", phonetic: "/prɑːmpt ˌendʒɪˈnɪrɪŋ/", pos: "noun", meaning: "提示詞工程（引導AI生成精準回答的技巧）", example: "Prompt engineering has become a desirable workplace skill.", exampleTrans: "提示詞工程已成為一項熱門的職場新技能。", category: "tech" },
+      { id: 52, word: "Hallucination", phonetic: "/həˌluːsɪˈneɪʃn/", pos: "noun", meaning: "(AI的) 幻覺現象、一本正經胡說八道", example: "AI hallucination is when models produce plausible falsehoods.", exampleTrans: "AI 幻覺是指模型生成看似煞有其事卻與事實不符的內容。", category: "tech" },
+      { id: 53, word: "Fine-tune", phonetic: "/ˈfaɪn tuːn/", pos: "verb", meaning: "微調、針對特定任務優化模型", example: "We fine-tuned the model on medical research data.", exampleTrans: "我們針對醫學研究數據對模型進行了微調優化。", category: "tech" },
+      { id: 54, word: "Algorithmic bias", phonetic: "/ˌælɡəˈrɪðmɪk ˈbaɪəs/", pos: "noun", meaning: "演算法偏見或歧視", example: "Researchers actively work to minimize algorithmic bias.", exampleTrans: "研究人員正積極努力減少演算法產生的偏見偏差。", category: "tech" },
+      { id: 55, word: "Latency", phonetic: "/ˈleɪtnsi/", pos: "noun", meaning: "延遲時間、反應滯後", example: "Edge computing reduces network latency significantly.", exampleTrans: "邊緣運算大幅降低了網路傳輸的延遲。", category: "tech" },
+      { id: 56, word: "Open-source", phonetic: "/ˌoʊpən ˈsɔːrs/", pos: "adj", meaning: "開源的、開放原始碼的", example: "This software is completely open-source and free to modify.", exampleTrans: "這套軟體完全開源，可自由修改擴展。", category: "tech" },
+      { id: 57, word: "Decentralized", phonetic: "/diːˈsentrəlaɪzd/", pos: "adj", meaning: "去中心化的", example: "Blockchain relies on a decentralized network architecture.", exampleTrans: "區塊鏈仰賴去中心化的網路架構運行。", category: "tech" },
+      { id: 58, word: "Bandwidth hog", phonetic: "/ˈbændwɪdθ hɔːɡ/", pos: "noun", meaning: "吃頻寬怪物、占用過多流量的應用", example: "4K video streaming can be a real bandwidth hog.", exampleTrans: "4K 影片串流會瘋狂占用網路頻寬。", category: "tech" },
+      { id: 59, word: "Glitch", phonetic: "/ɡlɪtʃ/", pos: "noun", meaning: "小故障、小差錯、閃退小問題", example: "A minor software glitch caused the screen to flicker.", exampleTrans: "一個微小的軟體故障導致螢幕發生閃爍。", category: "tech" },
+      { id: 60, word: "Disruptive", phonetic: "/dɪsˈrʌptɪv/", pos: "adj", meaning: "顛覆性的、突破現狀的", example: "Autonomous driving is a disruptive transportation technology.", exampleTrans: "自動駕駛是一項顛覆性的交通科技。", category: "tech" },
+      { id: 61, word: "Automation", phonetic: "/ˌɔːtəˈmeɪʃn/", pos: "noun", meaning: "自動化", example: "Process automation saves our team hours of manual input.", exampleTrans: "流程自動化為我們團隊省去了數小時的手動輸入時間。", category: "tech" },
+      { id: 62, word: "Zero-shot learning", phonetic: "/ˈzɪroʊ ʃɑːt ˈlɜːrnɪŋ/", pos: "noun", meaning: "零樣本學習", example: "Zero-shot learning allows models to categorize unseen objects.", exampleTrans: "零樣本學習能讓模型對未曾看過的類別進行分類推理。", category: "tech" },
+      { id: 63, word: "User experience", phonetic: "/ˈjuːzər ɪkˈspɪriəns/", pos: "noun", meaning: "使用者體驗 (UX)", example: "Smooth micro-animations greatly enhance the user experience.", exampleTrans: "順暢的微交互動畫能極大提升使用者體驗。", category: "tech" },
+      { id: 64, word: "Heuristic", phonetic: "/hjuˈrɪstɪk/", pos: "adj/noun", meaning: "啟發式的、經驗法則", example: "They implemented a heuristic rule to detect spam emails.", exampleTrans: "他們採用啟發式經驗法則來過濾垃圾郵件。", category: "tech" },
+      { id: 65, word: "Omnichannel", phonetic: "/ˌɑːmniˈtʃænl/", pos: "adj", meaning: "全通路的、虛實整合的", example: "Retailers adopt an omnichannel strategy to unify shopping.", exampleTrans: "零售商採用全通路策略來整合線上線下的購物體驗。", category: "tech" },
+      { id: 66, word: "Cloud-native", phonetic: "/klaʊd ˈneɪtɪv/", pos: "adj", meaning: "雲端原生的", example: "Our architecture is 100% cloud-native for continuous scaling.", exampleTrans: "我們的架構是純雲端原生設計，便於持續彈性擴充。", category: "tech" },
+      { id: 67, word: "Cybersecurity", phonetic: "/ˌsaɪbərsɪˈkjʊrəti/", pos: "noun", meaning: "資訊安全、網路防護", example: "Investing in cybersecurity protects confidential client data.", exampleTrans: "投資資安防護能保護機密客戶資料不受侵害。", category: "tech" },
+      { id: 68, word: "Sandbox", phonetic: "/ˈsændbɑːks/", pos: "noun", meaning: "沙盒環境（隔離測試空間）", example: "Always test third-party code in a sandbox first.", exampleTrans: "永遠要在沙盒隔離環境中先行測試第三方代碼。", category: "tech" },
+      { id: 69, word: "Deprecate", phonetic: "/ˈdeprəkeɪt/", pos: "verb", meaning: "(技術/API) 宣布棄用淘汰", example: "This legacy API will be deprecated in the next version.", exampleTrans: "這組舊版 API 將在下一個版本中被正式棄用淘汰。", category: "tech" },
+      { id: 70, word: "Multimodal", phonetic: "/ˌmʌltiˈmoʊdl/", pos: "adj", meaning: "多模態的（支援文字、圖片、聲音等）", example: "New multimodal models can interpret text and voice together.", exampleTrans: "新型多模態模型可同步辨識並理解文字與語音訊息。", category: "tech" },
+      { id: 71, word: "Ecosystem", phonetic: "/ˈiːkoʊsɪstəm/", pos: "noun", meaning: "生態系 (軟硬體結合體系)", example: "The developer ecosystem around this framework is thriving.", exampleTrans: "圍繞該框架建立的開發者生態系非常繁榮活躍。", category: "tech" },
+      { id: 72, word: "Telemetry", phonetic: "/təˈlemətri/", pos: "noun", meaning: "遙測數據、系統遠端監控日誌", example: "Telemetry helps us catch client-side runtime errors instantly.", exampleTrans: "遙測指標能幫助我們即時捕捉用戶端的運行時錯誤。", category: "tech" },
+      { id: 73, word: "Dark mode", phonetic: "/dɑːrk moʊd/", pos: "noun", meaning: "深色模式、夜間主題", example: "Many users prefer dark mode to reduce eye strain at night.", exampleTrans: "許多使用者偏好使用深色模式來減輕夜間用眼負擔。", category: "tech" },
+      { id: 74, word: "Responsive design", phonetic: "/rɪˈspɑːnsɪv dɪˈzaɪn/", pos: "noun", meaning: "響應式網頁設計", example: "Responsive design guarantees flawless layouts on phones.", exampleTrans: "響應式設計保證在智慧手機上呈現完美版面佈局。", category: "tech" },
+      { id: 75, word: "Refactor", phonetic: "/ˌriːˈfæktər/", pos: "verb", meaning: "重構代碼（優化結構而不改變外顯功能）", example: "We spent the weekend refactoring messy legacy modules.", exampleTrans: "我們花了整個週末重構雜亂陳舊的舊模組。", category: "tech" },
+
+      // === 情感社交 & 人際表達 (25 題) ===
+      { id: 76, word: "Empathy", phonetic: "/ˈempəθi/", pos: "noun", meaning: "同理心、感同身受", example: "Active listening requires genuine empathy for others.", exampleTrans: "積極傾聽需要對他人抱持真誠的同理心。", category: "emotion" },
+      { id: 77, word: "Vibe", phonetic: "/vaɪb/", pos: "noun", meaning: "氛圍、感覺、氣場", example: "I love the cozy vibe of this quiet neighborhood cafe.", exampleTrans: "我很喜歡這間寧靜社區咖啡館散發出的舒適氛圍。", category: "emotion" },
+      { id: 78, word: "Ghost", phonetic: "/ɡoʊst/", pos: "verb", meaning: "(社交上) 無預警斷聯、人間蒸發", example: "We chatted every day, and suddenly he ghosted me.", exampleTrans: "我們原本每天聊天，但他突然人間蒸發完全不回。", category: "emotion" },
+      { id: 79, word: "Gaslighting", phonetic: "/ˈɡæslaɪtɪŋ/", pos: "noun", meaning: "煤氣燈效應、心理操控使人自我懷疑", example: "Recognizing gaslighting is the first step to emotional safety.", exampleTrans: "辨識出煤氣燈心理操控是守護心理健康的第一步。", category: "emotion" },
+      { id: 80, word: "Resonance", phonetic: "/ˈrezənəns/", pos: "noun", meaning: "共鳴、深層共感", example: "His emotional story found deep resonance with the audience.", exampleTrans: "他那感人的故事在聽眾心中引發了深切的共鳴。", category: "emotion" },
+      { id: 81, word: "Heart-to-heart", phonetic: "/hɑːrt tə hɑːrt/", pos: "noun/adj", meaning: "推心置腹的談心、真摯交談", example: "They sat down for a heart-to-heart talk to clear the air.", exampleTrans: "他們坐下來敞開心扉長談，化解彼此心結。", category: "emotion" },
+      { id: 82, word: "Burnout", phonetic: "/ˈbɜːrnaʊt/", pos: "noun", meaning: "精疲力竭、職業倦怠", example: "Taking periodic breaks prevents mental burnout.", exampleTrans: "定期休假放鬆可以有效防止心靈枯竭與職業倦怠。", category: "emotion" },
+      { id: 83, word: "FOMO", phonetic: "/ˈfoʊmoʊ/", pos: "noun", meaning: "錯失恐懼症 (Fear Of Missing Out)", example: "Social media feeds often trigger acute FOMO.", exampleTrans: "社群動態牆經常容易引發強烈的錯失焦慮症。", category: "emotion" },
+      { id: 84, word: "Cathartic", phonetic: "/kəˈθɑːrtɪk/", pos: "adj", meaning: "宣洩抒發的、心靈淨化的", example: "Writing in my journal has been deeply cathartic for me.", exampleTrans: "寫日記對我而言是一種極具心靈宣洩淨化的療癒過程。", category: "emotion" },
+      { id: 85, word: "Bittersweet", phonetic: "/ˌbɪtərˈswiːt/", pos: "adj", meaning: "苦樂參半的、悲喜交集的", example: "Graduation day was a bittersweet moment for all of us.", exampleTrans: "畢業那天對我們所有人來說都是一段悲喜交織的時刻。", category: "emotion" },
+      { id: 86, word: "Vulnerable", phonetic: "/ˈvʌlnərəbl/", pos: "adj", meaning: "脆弱的、展現真誠坦白的一面", example: "It takes courage to be completely vulnerable with someone.", exampleTrans: "在他人面前毫無防備地展現脆弱需要莫大的勇氣。", category: "emotion" },
+      { id: 87, word: "Overwhelmed", phonetic: "/ˌoʊvərˈwelmd/", pos: "adj", meaning: "難以招架的、不知所措的", example: "She felt overwhelmed by the sudden influx of messages.", exampleTrans: "面對如雪片般湧來的訊息，她感到不知所措。", category: "emotion" },
+      { id: 88, word: "Serendipity", phonetic: "/ˌserənˈdɪpəti/", pos: "noun", meaning: "意外發現的美好事物、機緣巧合", example: "Meeting my mentor at the airport was pure serendipity.", exampleTrans: "在機場巧遇我的恩師完全是一場奇妙美麗的緣分。", category: "emotion" },
+      { id: 89, word: "Wholesome", phonetic: "/ˈhoʊlsəm/", pos: "adj", meaning: "溫馨治癒的、令人身心愉悅正向的", example: "Watching puppies play in the park is so wholesome.", exampleTrans: "看著小狗在公園嬉戲真是太溫馨療癒了。", category: "emotion" },
+      { id: 90, word: "Boundaries", phonetic: "/ˈbaʊndəriz/", pos: "noun", meaning: "人際界線、個人原則底線", example: "Setting healthy boundaries is essential in relationships.", exampleTrans: "在人際相處中建立健康的界線是極其重要的。", category: "emotion" },
+      { id: 91, word: "Nostalgic", phonetic: "/nɑːˈstældʒɪk/", pos: "adj", meaning: "懷舊的、引起童年回憶的", example: "Hearing that 90s song made me feel so nostalgic.", exampleTrans: "聽到那首 90 年代的老歌讓我心中湧起無限懷舊感。", category: "emotion" },
+      { id: 92, word: "Mindfulness", phonetic: "/ˈmaɪndflnəs/", pos: "noun", meaning: "正念、專注於當下的自覺", example: "Ten minutes of daily mindfulness meditation relieves anxiety.", exampleTrans: "每天進行十分鐘正念冥想能有效舒緩焦慮情緒。", category: "emotion" },
+      { id: 93, word: "Validation", phonetic: "/ˌvælɪˈdeɪʃn/", pos: "noun", meaning: "情感上的認可與肯定", example: "Everyone needs emotional validation from loved ones.", exampleTrans: "每個人都渴望獲得摯愛之人的情感肯定與認可。", category: "emotion" },
+      { id: 94, word: "Grounded", phonetic: "/ˈɡraʊndɪd/", pos: "adj", meaning: "踏實理性的、情緒沉穩的", example: "Even with celebrity status, she remained humble and grounded.", exampleTrans: "即使成名後，她依然保持謙遜、腳踏實地沉穩自處。", category: "emotion" },
+      { id: 95, word: "Compassion", phonetic: "/kəmˈpæʃn/", pos: "noun", meaning: "同情憐憫、慈悲心腸", example: "Show self-compassion when you make honest mistakes.", exampleTrans: "當犯了無心之過時，也要學會對自己多一些慈悲寬容。", category: "emotion" },
+      { id: 96, word: "Triggered", phonetic: "/ˈtrɪɡərd/", pos: "adj", meaning: "被觸發負面情緒的、被踩到痛處的", example: "He gets triggered whenever someone criticizes his voice.", exampleTrans: "只要有人批評他的嗓音，他就容易情緒激動被踩中地雷。", category: "emotion" },
+      { id: 97, word: "Resilience", phonetic: "/rɪˈzɪliəns/", pos: "noun", meaning: "復原力、韌性、逆境反彈能力", example: "Her mental resilience helped her overcome severe setbacks.", exampleTrans: "她強韌的心理復原力幫助她克服了沉重的逆境挫折。", category: "emotion" },
+      { id: 98, word: "Euphoria", phonetic: "/juːˈfɔːriə/", pos: "noun", meaning: "極度愉悅、狂喜陶醉之感", example: "Crossing the marathon finish line produced pure euphoria.", exampleTrans: "衝過馬拉松終點線那一刻，心中充滿了純粹的狂喜。", category: "emotion" },
+      { id: 99, word: "Introvert", phonetic: "/ˈɪntrəvɜːrt/", pos: "noun/adj", meaning: "內向者、喜好獨處給自己充電的人", example: "As an introvert, large crowded parties quickly exhaust me.", exampleTrans: "作為內向者，大型擁擠的派對會讓我迅速精疲力竭。", category: "emotion" },
+      { id: 100, word: "Gratitude", phonetic: "/ˈɡrætɪtuːd/", pos: "noun", meaning: "感恩、感激之情", example: "Practicing gratitude can transform your outlook on life.", exampleTrans: "經常心懷感恩能夠徹底轉變你看待生活的心境。", category: "emotion" }
+    ];
+
+    /* -------------------------------------------------------------
+     * 2. Web Audio API：高品質無依賴提示音效合成器
+     * ------------------------------------------------------------- */
+    const SoundFX = {
+      ctx: null,
+      init() {
+        if (!this.ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          if (AudioContext) {
+            this.ctx = new AudioContext();
+          }
+        }
+      },
+      play(type) {
+        try {
+          this.init();
+          if (!this.ctx) return;
+          if (this.ctx.state === 'suspended') {
+            this.ctx.resume();
+          }
+
+          const now = this.ctx.currentTime;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+
+          if (type === 'correct') {
+            // 清脆歡呼雙音 (E5 -> G#5)
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(659.25, now);
+            osc.frequency.setValueAtTime(830.61, now + 0.1);
+            gain.gain.setValueAtTime(0.15, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+            osc.start(now);
+            osc.stop(now + 0.35);
+          } else if (type === 'wrong') {
+            // 低沉短促錯誤音
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(220, now);
+            osc.frequency.setValueAtTime(160, now + 0.12);
+            gain.gain.setValueAtTime(0.18, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+            osc.start(now);
+            osc.stop(now + 0.3);
+          } else if (type === 'click') {
+            // 輕量微滴音
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(800, now);
+            gain.gain.setValueAtTime(0.08, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+            osc.start(now);
+            osc.stop(now + 0.06);
+          } else if (type === 'beep') {
+            // 錄音開始提示
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(523.25, now);
+            gain.gain.setValueAtTime(0.12, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+            osc.start(now);
+            osc.stop(now + 0.15);
+          }
+        } catch (e) {
+          console.warn("Audio Context playback error:", e);
+        }
+      }
+    };
+
+    /* -------------------------------------------------------------
+     * 3. 核心狀態管理器 (State Management)
+     * ------------------------------------------------------------- */
+    const AppState = {
+      currentMode: 'listen', // 'listen' | 'speak' | 'cards'
+      currentCategory: 'all',
+      speechRate: 1.0,
+      
+      // 統計數據
+      stats: {
+        total: 0,
+        correct: 0,
+        wrong: 0,
+        streak: 0,
+        bestStreak: 0,
+        speakAttempts: 0,
+        unlockedBadges: []
+      },
+
+      // 聽力模式狀態
+      listenQuiz: {
+        mode: 'choice', // 'choice' | 'spelling'
+        currentItem: null,
+        answered: false
+      },
+
+      // 口說模式狀態
+      speaking: {
+        currentItem: null,
+        isRecording: false,
+        recognition: null
+      },
+
+      // 單字卡模式狀態
+      flashcard: {
+        currentIndex: 0,
+        isFlipped: false
+      },
+
+      load() {
+        try {
+          const saved = localStorage.getItem('linguapulse_stats_v1');
+          if (saved) {
+            this.stats = { ...this.stats, ...JSON.parse(saved) };
+          }
+        } catch (e) {
+          console.error("Failed to load state", e);
+        }
+      },
+
+      save() {
+        try {
+          localStorage.setItem('linguapulse_stats_v1', JSON.stringify(this.stats));
+        } catch (e) {
+          console.error("Failed to save state", e);
+        }
+      },
+
+      recordAttempt(isCorrect, isSpeaking = false) {
+        this.stats.total++;
+        if (isCorrect) {
+          this.stats.correct++;
+          this.stats.streak++;
+          if (this.stats.streak > this.stats.bestStreak) {
+            this.stats.bestStreak = this.stats.streak;
+          }
+        } else {
+          this.stats.wrong++;
+          this.stats.streak = 0;
+        }
+
+        if (isSpeaking) {
+          this.stats.speakAttempts++;
+        }
+
+        this.checkBadges();
+        this.save();
+        updateStatsUI();
+      },
+
+      checkBadges() {
+        const awards = [
+          { id: 'first_step', name: '邁出第一步', desc: '完成第 1 次練習', icon: 'zap', test: (s) => s.total >= 1 },
+          { id: 'streak_3', name: '手感火熱', desc: '達成 3 連勝', icon: 'flame', test: (s) => s.bestStreak >= 3 },
+          { id: 'streak_10', name: '勢如破竹', desc: '達成 10 連勝', icon: 'award', test: (s) => s.bestStreak >= 10 },
+          { id: 'orator', name: '勇敢發音家', desc: '完成 5 次口說發音挑戰', icon: 'mic', test: (s) => s.speakAttempts >= 5 },
+          { id: 'master_100', name: '百詞斬常勝軍', desc: '練習次數突破 30 題', icon: 'shield-check', test: (s) => s.total >= 30 }
+        ];
+
+        awards.forEach(a => {
+          if (!this.stats.unlockedBadges.includes(a.id) && a.test(this.stats)) {
+            this.stats.unlockedBadges.push(a.id);
+          }
+        });
+      }
+    };
+
+    /* -------------------------------------------------------------
+     * 4. Web Speech API (語音合成 TTS & 語音辨識 STT)
+     * ------------------------------------------------------------- */
+    const SpeechController = {
+      voices: [],
+      selectedVoice: null,
+
+      init() {
+        if ('speechSynthesis' in window) {
+          const loadVoices = () => {
+            this.voices = window.speechSynthesis.getVoices();
+            // 優先選擇高品質美式英語音色
+            this.selectedVoice = this.voices.find(v => v.lang.startsWith('en-US') && (v.name.includes('Google') || v.name.includes('Natural') || v.name.includes('Samantha'))) ||
+                                 this.voices.find(v => v.lang.startsWith('en')) || null;
+          };
+          loadVoices();
+          window.speechSynthesis.onvoiceschanged = loadVoices;
+        }
+      },
+
+      speak(text, speed = AppState.speechRate) {
+        if (!('speechSynthesis' in window)) {
+          alert('您的瀏覽器不支援語音播放 (SpeechSynthesis)。');
+          return;
+        }
+        window.speechSynthesis.cancel(); // 停止目前朗讀
+        const utter = new SpeechSynthesisUtterance(text);
+        utter.lang = 'en-US';
+        utter.rate = speed;
+        if (this.selectedVoice) {
+          utter.voice = this.selectedVoice;
+        }
+        window.speechSynthesis.speak(utter);
+      },
+
+      getRecognition() {
+        const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRec) return null;
+        const recog = new SpeechRec();
+        recog.continuous = false;
+        recog.interimResults = false;
+        recog.lang = 'en-US';
+        return recog;
+      }
+    };
+
+    /* -------------------------------------------------------------
+     * 5. 字串相似度演算法 (Levenshtein Distance)
+     * ------------------------------------------------------------- */
+    function calculateSimilarity(s1, s2) {
+      const clean1 = s1.toLowerCase().replace(/[^a-z0-9]/g, '');
+      const clean2 = s2.toLowerCase().replace(/[^a-z0-9]/g, '');
+      if (clean1 === clean2) return 100;
+      if (!clean1.length || !clean2.length) return 0;
+
+      const track = Array(clean2.length + 1).fill(null).map(() =>
+        Array(clean1.length + 1).fill(null));
+
+      for (let i = 0; i <= clean1.length; i += 1) track[0][i] = i;
+      for (let j = 0; j <= clean2.length; j += 1) track[j][0] = j;
+
+      for (let j = 1; j <= clean2.length; j += 1) {
+        for (let i = 1; i <= clean1.length; i += 1) {
+          const indicator = clean1[i - 1] === clean2[j - 1] ? 0 : 1;
+          track[j][i] = Math.min(
+            track[j][i - 1] + 1,
+            track[j - 1][i] + 1,
+            track[j - 1][i - 1] + indicator
+          );
+        }
+      }
+
+      const distance = track[clean2.length][clean1.length];
+      const longest = Math.max(clean1.length, clean2.length);
+      return Math.round(((longest - distance) / longest) * 100);
+    }
+
+    /* -------------------------------------------------------------
+     * 6. 輔助工具函式
+     * ------------------------------------------------------------- */
+    function getFilteredVocab() {
+      if (AppState.currentCategory === 'all') return VOCAB_DATABASE;
+      return VOCAB_DATABASE.filter(item => item.category === AppState.currentCategory);
+    }
+
+    function getRandomItem() {
+      const pool = getFilteredVocab();
+      return pool[Math.floor(Math.random() * pool.length)];
+    }
+
+    function getCategoryName(cat) {
+      const map = {
+        slang: '生活俚語',
+        business: '職場商務',
+        tech: '科技潮詞',
+        emotion: '社交情感',
+        all: '全部單字'
+      };
+      return map[cat] || cat;
+    }
+
+    /* -------------------------------------------------------------
+     * 7. 聽力測驗邏輯 (Listening Quiz)
+     * ------------------------------------------------------------- */
+    function loadNewListeningQuiz() {
+      const item = getRandomItem();
+      AppState.listenQuiz.currentItem = item;
+      AppState.listenQuiz.answered = false;
+
+      // 更新分類標籤
+      document.getElementById('quiz-cat-tag').textContent = getCategoryName(item.category);
+      document.getElementById('quiz-result-feedback').classList.add('hidden');
+      document.getElementById('spelling-input').value = '';
+      document.getElementById('spelling-hint-text').textContent = '';
+
+      if (AppState.listenQuiz.mode === 'choice') {
+        setupQuizChoices(item);
+      }
+
+      // 自動發音引導使用者
+      setTimeout(() => {
+        SpeechController.speak(item.word);
+      }, 250);
+    }
+
+    function setupQuizChoices(correctItem) {
+      const container = document.getElementById('quiz-choices-container');
+      container.innerHTML = '';
+
+      // 從庫中抽取 3 個錯誤干擾項
+      const otherItems = VOCAB_DATABASE.filter(v => v.id !== correctItem.id);
+      const shuffledOthers = otherItems.sort(() => 0.5 - Math.random()).slice(0, 3);
+      const options = [correctItem, ...shuffledOthers].sort(() => 0.5 - Math.random());
+
+      options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = "quiz-choice-btn group text-left p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-slate-900/60 hover:border-indigo-400 dark:hover:border-indigo-500 shadow-sm transition duration-200 flex flex-col justify-center active:scale-98";
+        btn.innerHTML = `
+          <div class="flex items-center justify-between w-full">
+            <span class="text-base font-bold text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400">${opt.word}</span>
+            <span class="text-[10px] text-slate-400 uppercase font-mono">${opt.pos}</span>
+          </div>
+          <span class="text-xs text-slate-500 dark:text-slate-400 line-clamp-1 mt-1">${opt.meaning}</span>
+        `;
+
+        btn.addEventListener('click', () => handleQuizAnswer(opt, btn, correctItem));
+        container.appendChild(btn);
+      });
+    }
+
+    function handleQuizAnswer(selectedOption, btnEl, correctItem) {
+      if (AppState.listenQuiz.answered) return;
+      AppState.listenQuiz.answered = true;
+
+      const isCorrect = selectedOption.id === correctItem.id;
+      SoundFX.play(isCorrect ? 'correct' : 'wrong');
+      AppState.recordAttempt(isCorrect);
+
+      // 高亮顯示所有按鈕
+      const allBtns = document.querySelectorAll('.quiz-choice-btn');
+      allBtns.forEach(btn => {
+        btn.classList.add('pointer-events-none');
+        if (btn.innerText.includes(correctItem.word)) {
+          btn.classList.remove('border-slate-200', 'dark:border-slate-800');
+          btn.classList.add('border-emerald-500', 'bg-emerald-50', 'dark:bg-emerald-950/60', 'text-emerald-900');
+        }
+      });
+
+      if (!isCorrect && btnEl) {
+        btnEl.classList.add('border-rose-500', 'bg-rose-50', 'dark:bg-rose-950/60');
+      }
+
+      showQuizFeedback(correctItem, isCorrect);
+    }
+
+    function checkSpellingAnswer() {
+      if (AppState.listenQuiz.answered) return;
+      const input = document.getElementById('spelling-input');
+      const val = input.value.trim().toLowerCase();
+      const current = AppState.listenQuiz.currentItem;
+      if (!val) return;
+
+      AppState.listenQuiz.answered = true;
+      const cleanTarget = current.word.toLowerCase();
+      const isCorrect = val === cleanTarget;
+
+      SoundFX.play(isCorrect ? 'correct' : 'wrong');
+      AppState.recordAttempt(isCorrect);
+
+      input.disabled = true;
+      if (isCorrect) {
+        input.classList.add('border-emerald-500', 'bg-emerald-50', 'dark:bg-emerald-950/40');
+      } else {
+        input.classList.add('border-rose-500', 'bg-rose-50', 'dark:bg-rose-950/40');
+      }
+
+      showQuizFeedback(current, isCorrect);
+    }
+
+    function showQuizFeedback(item, isSuccess) {
+      const fb = document.getElementById('quiz-result-feedback');
+      fb.classList.remove('hidden');
+
+      if (isSuccess) {
+        fb.className = "mt-6 w-full p-4 rounded-2xl border transition-all duration-300 border-emerald-300 bg-emerald-50/70 dark:border-emerald-900 dark:bg-emerald-950/40";
+      } else {
+        fb.className = "mt-6 w-full p-4 rounded-2xl border transition-all duration-300 border-rose-300 bg-rose-50/70 dark:border-rose-900 dark:bg-rose-950/40";
+      }
+
+      document.getElementById('quiz-word-display').textContent = item.word;
+      document.getElementById('quiz-phonetic-display').textContent = item.phonetic;
+      document.getElementById('quiz-pos-display').textContent = item.pos;
+      document.getElementById('quiz-meaning-display').textContent = item.meaning;
+      document.getElementById('quiz-example-display').textContent = `"${item.example}"`;
+      
+      lucide.createIcons();
+    }
+
+    /* -------------------------------------------------------------
+     * 8. 口說發音挑戰邏輯 (Speaking Challenge)
+     * ------------------------------------------------------------- */
+    function loadNewSpeakingChallenge() {
+      const item = getRandomItem();
+      AppState.speaking.currentItem = item;
+
+      document.getElementById('speak-cat-tag').textContent = getCategoryName(item.category);
+      document.getElementById('speak-target-word').textContent = item.word;
+      document.getElementById('speak-target-phonetic').textContent = item.phonetic;
+      document.getElementById('speak-target-meaning').textContent = item.meaning;
+      document.getElementById('speak-target-example').textContent = `"${item.example}"`;
+
+      document.getElementById('speak-evaluation').classList.add('hidden');
+      setMicState(false);
+    }
+
+    function setMicState(isRecording) {
+      AppState.speaking.isRecording = isRecording;
+      const ring = document.getElementById('mic-pulse-ring');
+      const label = document.getElementById('mic-status-label');
+      const micBtn = document.getElementById('btn-mic');
+
+      if (isRecording) {
+        ring.classList.remove('hidden');
+        label.textContent = "正在聆聽... 請清晰讀出該字詞";
+        label.className = "text-xs font-semibold text-rose-500 animate-pulse";
+        micBtn.classList.add('bg-rose-600', 'text-white');
+      } else {
+        ring.classList.add('hidden');
+        label.textContent = "點擊麥克風開始朗讀";
+        label.className = "text-xs font-semibold text-slate-500 dark:text-slate-400";
+        micBtn.classList.remove('bg-rose-600');
+      }
+    }
+
+    function startSpeakingRecognition() {
+      const recognition = SpeechController.getRecognition();
+      if (!recognition) {
+        alert("此瀏覽器目前不支援即時語音辨識，請推薦使用 Google Chrome 或 Microsoft Edge 瀏覽器！");
+        return;
+      }
+
+      SoundFX.play('beep');
+      setMicState(true);
+
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript.trim();
+        evaluateSpeakingResult(transcript);
+      };
+
+      recognition.onerror = (e) => {
+        console.warn('Recognition error:', e.error);
+        setMicState(false);
+        if (e.error === 'not-allowed') {
+          alert('請允許網頁存取麥克風權限以進行口說測試！');
+        } else if (e.error === 'no-speech') {
+          document.getElementById('mic-status-label').textContent = "未偵測到聲音，請點擊重試";
+        }
+      };
+
+      recognition.onend = () => {
+        setMicState(false);
+      };
+
+      try {
+        recognition.start();
+      } catch (err) {
+        console.error("Recognition start error", err);
+        setMicState(false);
+      }
+    }
+
+    function evaluateSpeakingResult(recognizedText) {
+      const target = AppState.speaking.currentItem.word;
+      const accuracy = calculateSimilarity(recognizedText, target);
+      const isPass = accuracy >= 70;
+
+      SoundFX.play(isPass ? 'correct' : 'wrong');
+      AppState.recordAttempt(isPass, true);
+
+      // 呈現評測視窗
+      const evalBox = document.getElementById('speak-evaluation');
+      evalBox.classList.remove('hidden');
+
+      document.getElementById('speak-recognized-text').textContent = `"${recognizedText}"`;
+      document.getElementById('speak-accuracy-pct').textContent = `${accuracy}%`;
+      
+      const bar = document.getElementById('speak-accuracy-bar');
+      bar.style.width = `${accuracy}%`;
+      
+      if (accuracy >= 85) {
+        bar.className = "h-full rounded-full transition-all duration-500 bg-emerald-500";
+        document.getElementById('speak-score-stars').innerHTML = "★★★★★";
+        document.getElementById('speak-feedback-comment').textContent = "完美！發音極其道地精準！🎯";
+        document.getElementById('speak-feedback-comment').className = "text-xs text-center font-bold text-emerald-600 dark:text-emerald-400 mt-1";
+      } else if (accuracy >= 70) {
+        bar.className = "h-full rounded-full transition-all duration-500 bg-indigo-500";
+        document.getElementById('speak-score-stars').innerHTML = "★★★★☆";
+        document.getElementById('speak-feedback-comment').textContent = "很棒！辨識清晰度良好，已達成標準！👍";
+        document.getElementById('speak-feedback-comment').className = "text-xs text-center font-bold text-indigo-600 dark:text-indigo-400 mt-1";
+      } else {
+        bar.className = "h-full rounded-full transition-all duration-500 bg-rose-500";
+        document.getElementById('speak-score-stars').innerHTML = "★★☆☆☆";
+        document.getElementById('speak-feedback-comment').textContent = "發音有些模糊或重音不對，點擊上方喇叭多聽幾次再試試！💪";
+        document.getElementById('speak-feedback-comment').className = "text-xs text-center font-bold text-rose-500 mt-1";
+      }
+
+      lucide.createIcons();
+    }
+
+    /* -------------------------------------------------------------
+     * 9. 單字卡探索邏輯 (Flashcards)
+     * ------------------------------------------------------------- */
+    function updateFlashcardUI() {
+      const pool = getFilteredVocab();
+      if (!pool.length) return;
+      if (AppState.flashcard.currentIndex >= pool.length) {
+        AppState.flashcard.currentIndex = 0;
+      }
+      const item = pool[AppState.flashcard.currentIndex];
+
+      // 重置翻面
+      AppState.flashcard.isFlipped = false;
+      document.getElementById('flashcard-inner').classList.remove('rotate-y-180');
+
+      // 更新進度文字
+      document.getElementById('card-index-indicator').textContent = `${AppState.flashcard.currentIndex + 1} / ${pool.length}`;
+
+      // 正面內容
+      document.getElementById('fc-category').textContent = getCategoryName(item.category);
+      document.getElementById('fc-word').textContent = item.word;
+      document.getElementById('fc-phonetic').textContent = item.phonetic;
+      document.getElementById('fc-pos').textContent = item.pos;
+
+      // 背面內容
+      document.getElementById('fc-meaning').textContent = item.meaning;
+      document.getElementById('fc-example').textContent = `"${item.example}"`;
+      document.getElementById('fc-example-trans').textContent = `「${item.exampleTrans}」`;
+
+      lucide.createIcons();
+    }
+
+    function toggleFlipCard() {
+      SoundFX.play('click');
+      AppState.flashcard.isFlipped = !AppState.flashcard.isFlipped;
+      const inner = document.getElementById('flashcard-inner');
+      if (AppState.flashcard.isFlipped) {
+        inner.classList.add('rotate-y-180');
+      } else {
+        inner.classList.remove('rotate-y-180');
+      }
+    }
+
+    /* -------------------------------------------------------------
+     * 10. 戰績成就與儀表板 UI 更新
+     * ------------------------------------------------------------- */
+    function updateStatsUI() {
+      const s = AppState.stats;
+      document.getElementById('streak-counter').textContent = `${s.streak} 連勝`;
+      document.getElementById('stat-total').textContent = s.total;
+      document.getElementById('stat-correct').textContent = s.correct;
+      document.getElementById('stat-wrong').textContent = s.wrong;
+
+      const accuracy = s.total > 0 ? Math.round((s.correct / s.total) * 100) : 0;
+      document.getElementById('stat-accuracy').textContent = `${accuracy}%`;
+
+      // 渲染徽章
+      const badgesContainer = document.getElementById('badges-container');
+      badgesContainer.innerHTML = '';
+
+      const allBadges = [
+        { id: 'first_step', name: '邁出第一步', desc: '完成第 1 題練習', icon: 'zap' },
+        { id: 'streak_3', name: '手感火熱', desc: '達成 3 連勝', icon: 'flame' },
+        { id: 'streak_10', name: '勢如破竹', desc: '達成 10 連勝', icon: 'award' },
+        { id: 'orator', name: '發音大師', desc: '完成 5 次口說挑戰', icon: 'mic' },
+        { id: 'master_100', name: '百詞斬常勝軍', desc: '累積練習破 30 題', icon: 'shield-check' }
+      ];
+
+      allBadges.forEach(b => {
+        const isUnlocked = s.unlockedBadges.includes(b.id);
+        const card = document.createElement('div');
+        card.className = `p-3 rounded-2xl border flex items-center gap-3 transition ${
+          isUnlocked 
+            ? 'bg-gradient-to-r from-amber-500/10 to-indigo-500/10 border-amber-300 dark:border-amber-600/50' 
+            : 'bg-slate-100 dark:bg-slate-900/40 border-slate-200 dark:border-slate-800 opacity-40 grayscale'
+        }`;
+        card.innerHTML = `
+          <div class="w-9 h-9 rounded-xl flex items-center justify-center text-white ${isUnlocked ? 'bg-amber-500' : 'bg-slate-400'}">
+            <i data-lucide="${b.icon}" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <div class="text-xs font-bold text-slate-800 dark:text-slate-100 flex items-center gap-1">
+              ${b.name}
+              ${isUnlocked ? '<i data-lucide="check" class="w-3 h-3 text-emerald-500"></i>' : ''}
+            </div>
+            <div class="text-[10px] text-slate-500 dark:text-slate-400">${b.desc}</div>
+          </div>
+        `;
+        badgesContainer.appendChild(card);
+      });
+
+      lucide.createIcons();
+    }
+
+    /* -------------------------------------------------------------
+     * 11. 初始化與事件綁定 (Event Listeners)
+     * ------------------------------------------------------------- */
+    window.onload = function () {
+      AppState.load();
+      SpeechController.init();
+      updateStatsUI();
+
+      // 檢查 SpeechRecognition 相容性
+      if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+        document.getElementById('speech-support-alert').classList.remove('hidden');
+      }
+
+      // 深色模式系統偏好判斷
+      if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.documentElement.classList.add('dark');
+      }
+
+      // 頂部主題按鈕切換
+      document.getElementById('theme-toggle').addEventListener('click', () => {
+        SoundFX.play('click');
+        document.documentElement.classList.toggle('dark');
+      });
+
+      // 頂部統計視窗切換
+      const statsModal = document.getElementById('stats-modal');
+      document.getElementById('btn-stats-modal').addEventListener('click', () => {
+        SoundFX.play('click');
+        updateStatsUI();
+        statsModal.classList.remove('hidden');
+      });
+      document.getElementById('btn-close-stats').addEventListener('click', () => {
+        statsModal.classList.add('hidden');
+      });
+      document.getElementById('btn-done-stats').addEventListener('click', () => {
+        statsModal.classList.add('hidden');
+      });
+      document.getElementById('btn-reset-stats').addEventListener('click', () => {
+        if (AppState.stats.total === 0) return;
+        AppState.stats = { total: 0, correct: 0, wrong: 0, streak: 0, bestStreak: 0, speakAttempts: 0, unlockedBadges: [] };
+        AppState.save();
+        updateStatsUI();
+      });
+
+      // 模式 Tab 切換
+      const tabButtons = document.querySelectorAll('.nav-tab');
+      tabButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          SoundFX.play('click');
+          tabButtons.forEach(b => {
+            b.classList.remove('active', 'bg-white', 'dark:bg-slate-800', 'text-indigo-600', 'dark:text-indigo-400', 'shadow-sm');
+            b.classList.add('text-slate-600', 'dark:text-slate-400');
+          });
+          btn.classList.add('active', 'bg-white', 'dark:bg-slate-800', 'text-indigo-600', 'dark:text-indigo-400', 'shadow-sm');
+          btn.classList.remove('text-slate-600', 'dark:text-slate-400');
+
+          const mode = btn.dataset.mode;
+          AppState.currentMode = mode;
+          document.querySelectorAll('.mode-view').forEach(view => view.classList.add('hidden'));
+
+          if (mode === 'listen') {
+            document.getElementById('section-listen').classList.remove('hidden');
+            loadNewListeningQuiz();
+          } else if (mode === 'speak') {
+            document.getElementById('section-speak').classList.remove('hidden');
+            loadNewSpeakingChallenge();
+          } else if (mode === 'cards') {
+            document.getElementById('section-cards').classList.remove('hidden');
+            updateFlashcardUI();
+          }
+        });
+      });
+
+      // 分類按鈕切換
+      const catPills = document.querySelectorAll('.cat-pill');
+      catPills.forEach(pill => {
+        pill.addEventListener('click', () => {
+          SoundFX.play('click');
+          catPills.forEach(p => {
+            p.classList.remove('active', 'bg-indigo-600', 'text-white');
+            p.classList.add('bg-slate-200', 'dark:bg-slate-800', 'text-slate-700', 'dark:text-slate-300');
+          });
+          pill.classList.add('active', 'bg-indigo-600', 'text-white');
+          pill.classList.remove('bg-slate-200', 'dark:bg-slate-800', 'text-slate-700', 'dark:text-slate-300');
+
+          AppState.currentCategory = pill.dataset.cat;
+          if (AppState.currentMode === 'listen') loadNewListeningQuiz();
+          else if (AppState.currentMode === 'speak') loadNewSpeakingChallenge();
+          else if (AppState.currentMode === 'cards') {
+            AppState.flashcard.currentIndex = 0;
+            updateFlashcardUI();
+          }
+        });
+      });
+
+      // 語速切換
+      const btnNormal = document.getElementById('btn-speed-normal');
+      const btnSlow = document.getElementById('btn-speed-slow');
+      btnNormal.addEventListener('click', () => {
+        AppState.speechRate = 1.0;
+        btnNormal.className = "text-xs px-2 py-0.5 rounded font-bold bg-indigo-100 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300";
+        btnSlow.className = "text-xs px-2 py-0.5 rounded font-medium text-slate-500 dark:text-slate-400";
+      });
+      btnSlow.addEventListener('click', () => {
+        AppState.speechRate = 0.75;
+        btnSlow.className = "text-xs px-2 py-0.5 rounded font-bold bg-indigo-100 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300";
+        btnNormal.className = "text-xs px-2 py-0.5 rounded font-medium text-slate-500 dark:text-slate-400";
+      });
+
+      // --- 聽力測驗按鈕事件 ---
+      document.getElementById('btn-play-audio').addEventListener('click', () => {
+        SoundFX.play('click');
+        if (AppState.listenQuiz.currentItem) {
+          SpeechController.speak(AppState.listenQuiz.currentItem.word);
+        }
+      });
+
+      document.getElementById('btn-next-listen').addEventListener('click', () => {
+        SoundFX.play('click');
+        loadNewListeningQuiz();
+      });
+
+      document.getElementById('btn-play-example').addEventListener('click', () => {
+        if (AppState.listenQuiz.currentItem) {
+          SpeechController.speak(AppState.listenQuiz.currentItem.example, 0.9);
+        }
+      });
+
+      document.getElementById('btn-listen-mode-toggle').addEventListener('click', () => {
+        SoundFX.play('click');
+        const isChoice = AppState.listenQuiz.mode === 'choice';
+        AppState.listenQuiz.mode = isChoice ? 'spelling' : 'choice';
+
+        document.getElementById('quiz-mode-label').textContent = isChoice ? "切換為選項題" : "切換為拼字聽寫";
+        document.getElementById('quiz-choices-container').classList.toggle('hidden', isChoice);
+        document.getElementById('quiz-spelling-container').classList.toggle('hidden', !isChoice);
+        
+        loadNewListeningQuiz();
+      });
+
+      document.getElementById('btn-submit-spelling').addEventListener('click', checkSpellingAnswer);
+      document.getElementById('spelling-input').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') checkSpellingAnswer();
+      });
+
+      document.getElementById('btn-hint-spelling').addEventListener('click', () => {
+        if (!AppState.listenQuiz.currentItem) return;
+        const w = AppState.listenQuiz.currentItem.word;
+        document.getElementById('spelling-hint-text').textContent = `提示：首字母為 "${w[0].toUpperCase()}"，共 ${w.length} 個字元。`;
+      });
+
+      // --- 口說挑戰按鈕事件 ---
+      document.getElementById('btn-mic').addEventListener('click', () => {
+        startSpeakingRecognition();
+      });
+
+      document.getElementById('btn-speak-listen-ref').addEventListener('click', () => {
+        SoundFX.play('click');
+        if (AppState.speaking.currentItem) {
+          SpeechController.speak(AppState.speaking.currentItem.word);
+        }
+      });
+
+      document.getElementById('btn-speak-retry').addEventListener('click', () => {
+        SoundFX.play('click');
+        document.getElementById('speak-evaluation').classList.add('hidden');
+        startSpeakingRecognition();
+      });
+
+      document.getElementById('btn-next-speak').addEventListener('click', () => {
+        SoundFX.play('click');
+        loadNewSpeakingChallenge();
+      });
+
+      // --- 單字卡探索按鈕事件 ---
+      document.getElementById('flashcard-container').addEventListener('click', toggleFlipCard);
+      document.getElementById('btn-flip-card').addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleFlipCard();
+      });
+
+      document.getElementById('btn-prev-card').addEventListener('click', () => {
+        SoundFX.play('click');
+        const pool = getFilteredVocab();
+        AppState.flashcard.currentIndex = (AppState.flashcard.currentIndex - 1 + pool.length) % pool.length;
+        updateFlashcardUI();
+      });
+
+      document.getElementById('btn-next-card').addEventListener('click', () => {
+        SoundFX.play('click');
+        const pool = getFilteredVocab();
+        AppState.flashcard.currentIndex = (AppState.flashcard.currentIndex + 1) % pool.length;
+        updateFlashcardUI();
+      });
+
+      document.getElementById('btn-random-card').addEventListener('click', () => {
+        SoundFX.play('click');
+        const pool = getFilteredVocab();
+        AppState.flashcard.currentIndex = Math.floor(Math.random() * pool.length);
+        updateFlashcardUI();
+      });
+
+      document.querySelector('.btn-card-audio').addEventListener('click', (e) => {
+        e.stopPropagation();
+        const pool = getFilteredVocab();
+        const item = pool[AppState.flashcard.currentIndex];
+        SpeechController.speak(item.word);
+      });
+
+      document.querySelector('.btn-card-sentence-audio').addEventListener('click', (e) => {
+        e.stopPropagation();
+        const pool = getFilteredVocab();
+        const item = pool[AppState.flashcard.currentIndex];
+        SpeechController.speak(item.example, 0.9);
+      });
+
+      // 載入預設初始題目
+      loadNewListeningQuiz();
+      lucide.createIcons();
+    };
+  </script>
+</body>
+</html>
